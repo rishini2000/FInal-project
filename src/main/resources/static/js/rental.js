@@ -17,6 +17,19 @@ const buttonUpdate = document.getElementById("buttonUpdate");
 const buttonClear = document.getElementById("buttonClear");
 const tableBodyElement = document.querySelector("#tableBodyRental");
 
+
+dateAppointmentElement.addEventListener("change", validateAppointmentDate);
+dateFunctionElement.addEventListener("change", validateFunctionDate);
+dateFittonElement.addEventListener("change", validateFittonDate);
+datePickupElement.addEventListener("change", validatePickupDate);
+dateReturnElement.addEventListener("change", validateReturnDate);
+textAdvanceElement.addEventListener("keyup", validateAdvance);
+textAdvanceElement.addEventListener("change", validateAdvance);
+textKeyMoneyElement.addEventListener("keyup", validateKeyMoney);
+textKeyMoneyElement.addEventListener("change", validateKeyMoney);
+
+textTotalChargeElement.addEventListener("keyup", validateKeyMoney);
+textTotalChargeElement.addEventListener("change", validateKeyMoney);
 // item list elements
 const searchItemElement = document.querySelector("#searchItem");
 const hiddenItemElement = document.querySelector("#selectItem");
@@ -99,6 +112,15 @@ function refreshRentalForm() {
     clearElement([dateAppointmentElement, dateFunctionElement, dateFittonElement, datePickupElement, dateReturnElement, textKeyMoneyElement, textTotalChargeElement, textAdvanceElement, textNotesElement]);
     clearValidation(searchCustomerElement);
 
+    // Prevent selecting past dates for Appointment Date
+    let today = new Date().toISOString().split("T")[0];
+
+    dateAppointmentElement.min = today;
+    dateFunctionElement.min = today;
+    dateFittonElement.min = today;
+    datePickupElement.min = today;
+    dateReturnElement.min = today;
+
     setRentalFormMode('new');
 
 }
@@ -135,7 +157,8 @@ const getStatus = (obj) => {
     return getEnumDisplayName("rentalStatus", obj.rentalStatus);
 }
 
-// Defensive override to prevent TypeError if rental. is undefined
+
+// ********************Defensive override to prevent TypeError if rental. is undefined
 function checkRentalFormErrors() {
 
     let errors = "";
@@ -147,29 +170,31 @@ function checkRentalFormErrors() {
         setValid(searchCustomerElement);
     }
 
-    //********appointment date check errors and validation
+    // ******** Appointment Date Validation ********
+
     if (!dateAppointmentElement.value) {
-        errors += "Appointment date is required.\n";
+
+        errors += "Please select an Appointment Date.\n";
         setInvalid(dateAppointmentElement);
+
     } else {
-        setValid(dateAppointmentElement);
+
+        let today = new Date();
+        let appointmentDate = new Date(dateAppointmentElement.value);
+
+        // Remove time part
+        today.setHours(0, 0, 0, 0);
+        appointmentDate.setHours(0, 0, 0, 0);
+
+        if (appointmentDate < today) {
+            errors += "Please select today's date or a future date for the Appointment Date.\n";
+            setInvalid(dateAppointmentElement);
+        } else {
+            setValid(dateAppointmentElement);
+        }
     }
 
-    let today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    let appointmentDate = new Date(dateAppointmentElement.value);
-    appointmentDate.setHours(0, 0, 0, 0);
-
-    if (appointmentDate < today) {
-        errors += "Appointment Date cannot be in the past.\n";
-        setInvalid(dateAppointmentElement);
-    } else {
-        setValid(dateAppointmentElement);
-    }
-
-
-//********function date check errors and validation
+    //********function date check errors and validation
     if (!rental.function_date) {
         errors += "Function date is required.\n";
         setInvalid(dateFunctionElement);
@@ -184,149 +209,198 @@ function checkRentalFormErrors() {
         let functionDate = new Date(dateFunctionElement.value);
 
         if (functionDate < appointmentDate) {
-            errors += "Function Date cannot be before the Appointment Date.\n";
+            errors += "Please select a Function Date on or after the Appointment Date.\n";
             setInvalid(dateFunctionElement);
         }
     }
 
-//**************** Fitton Date Validation ****************
+    //**************** Fitton Date Validation ****************
 
-//**************** Fitton Date Validation ****************
 
-if (!rental.fitton_date) {
+    if (!rental.fitton_date) {
 
-    errors += "Fitton Date is required.\n";
-    setInvalid(dateFittonElement);
+        errors += "Fitton Date is required.\n";
+        setInvalid(dateFittonElement);
 
-} else {
+    } else {
 
-    let appointmentDate = new Date(dateAppointmentElement.value);
-    let fittonDate = new Date(dateFittonElement.value);
-    let functionDate = new Date(dateFunctionElement.value);
+        let appointmentDate = new Date(dateAppointmentElement.value);
+        let fittonDate = new Date(dateFittonElement.value);
+        let functionDate = new Date(dateFunctionElement.value);
 
-    appointmentDate.setHours(0,0,0,0);
-    fittonDate.setHours(0,0,0,0);
-    functionDate.setHours(0,0,0,0);
+        appointmentDate.setHours(0, 0, 0, 0);
+        fittonDate.setHours(0, 0, 0, 0);
+        functionDate.setHours(0, 0, 0, 0);
 
-    let fittonError = false;
+        let fittonError = false;
 
-    // Fitton cannot be before Appointment
-    if (fittonDate < appointmentDate) {
-        errors += "Fitton Date cannot be before the Appointment Date.\n";
-        fittonError = true;
-    }
-
-    // Fitton cannot be after Function
-    if (fittonDate > functionDate) {
-        errors += "Fitton Date cannot be after the Function Date.\n";
-        fittonError = true;
-    }
-
-    // Alteration
-    if (switchAlterationElement.checked) {
-
-        let minimumFunctionDate = new Date(fittonDate);
-        minimumFunctionDate.setDate(minimumFunctionDate.getDate() + 5);
-
-        if (functionDate < minimumFunctionDate) {
-            errors += "When alteration is required, the Function Date must be at least 5 days after the Fitton Date.\n";
+        // Fitton cannot be before Appointment
+        if (fittonDate < appointmentDate) {
+            errors += "Please select a Fitton Date on or after the Appointment Date.\n";
             fittonError = true;
         }
 
+        // Fitton cannot be after Function
+        if (fittonDate > functionDate) {
+            errors += "Please select a Fitton Date on or before the Function Date.\n";
+            fittonError = true;
+        }
+
+        // Alteration
+        if (switchAlterationElement.checked) {
+
+            let minimumFunctionDate = new Date(fittonDate);
+            minimumFunctionDate.setDate(minimumFunctionDate.getDate() + 5);
+
+            if (functionDate < minimumFunctionDate) {
+                errors += "Please select a Function Date that is at least 5 days after the Fitton Date because this item requires alteration.\n";
+                fittonError = true;
+            }
+
+        }
+
+        if (fittonError) {
+            setInvalid(dateFittonElement);
+        } else {
+            setValid(dateFittonElement);
+        }
+
     }
 
-    if (fittonError) {
-        setInvalid(dateFittonElement);
-    } else {
-        setValid(dateFittonElement);
-    }
-
-}
-
-// ******************* Pickup Date Validation ***********************
-
-if (!rental.pickup_date) {
-
-    errors += "Please select the Pickup Date.\n";
-    setInvalid(datePickupElement);
-
-} else {
-
-    let pickupDate = new Date(datePickupElement.value);
-    let appointmentDate = new Date(dateAppointmentElement.value);
-    let fittonDate = new Date(dateFittonElement.value);
-    let functionDate = new Date(dateFunctionElement.value);
-
-    pickupDate.setHours(0, 0, 0, 0);
-    appointmentDate.setHours(0, 0, 0, 0);
-    fittonDate.setHours(0, 0, 0, 0);
-    functionDate.setHours(0, 0, 0, 0);
-
+    // ******************* Pickup Date Validation ***********************
     let pickupError = false;
+    if (!rental.pickup_date) {
 
-    // Pickup cannot be before Appointment Date
-    if (pickupDate < appointmentDate) {
-        errors += "Pickup Date cannot be before the Appointment Date.\n";
-        pickupError = true;
-    }
-
-    // Pickup cannot be before Fitton Date
-    if (pickupDate < fittonDate) {
-        errors += "Pickup Date cannot be before the Fitton Date.\n";
-        pickupError = true;
-    }
-
-    // Pickup cannot be after Function Date
-    if (pickupDate > functionDate) {
-        errors += "Pickup Date cannot be after the Function Date.\n";
-        pickupError = true;
-    }
-
-    // **************** Alteration Validation ****************
-    if (switchAlterationElement.checked) {
-
-        // Function Date must be at least 5 days after Fitton Date
-        let minimumFunctionDate = new Date(fittonDate);
-        minimumFunctionDate.setDate(minimumFunctionDate.getDate() + 5);
-
-        if (functionDate < minimumFunctionDate) {
-            errors += "At least 5 days are required between the Fitton Date and the Function Date for alteration.\n";
-            pickupError = true;
-        }
-
-        // Pickup cannot be the same as Appointment Date
-        if (pickupDate.getTime() === appointmentDate.getTime()) {
-            errors += "Pickup Date cannot be the same as the Appointment Date when alteration is required.\n";
-            pickupError = true;
-        }
-
-        // Pickup cannot be the same as Fitton Date
-        if (pickupDate.getTime() === fittonDate.getTime()) {
-            errors += "Pickup Date cannot be the same as the Fitton Date when alteration is required.\n";
-            pickupError = true;
-        }
-
-        // Pickup cannot be the same as Function Date
-        if (pickupDate.getTime() === functionDate.getTime()) {
-            errors += "Pickup Date cannot be the same as the Function Date when alteration is required.\n";
-            pickupError = true;
-        }
-
-    }
-}
-    // Final Validation
-    if (pickupError) {
+        errors += "Please select the Pickup Date.\n";
         setInvalid(datePickupElement);
+
     } else {
-        setValid(datePickupElement);
+
+        let pickupDate = new Date(datePickupElement.value);
+        let appointmentDate = new Date(dateAppointmentElement.value);
+        let fittonDate = new Date(dateFittonElement.value);
+        let functionDate = new Date(dateFunctionElement.value);
+
+        pickupDate.setHours(0, 0, 0, 0);
+        appointmentDate.setHours(0, 0, 0, 0);
+        fittonDate.setHours(0, 0, 0, 0);
+        functionDate.setHours(0, 0, 0, 0);
+
+        // Pickup cannot be before Appointment Date
+        if (pickupDate < appointmentDate) {
+            errors += "Please select a Pickup Date on or after the Appointment Date.\n";
+            pickupError = true;
+        }
+
+        // Pickup cannot be before Fitton Date
+        if (pickupDate < fittonDate) {
+            errors += "Please select a Pickup Date on or after the Fitton Date.\n";
+            pickupError = true;
+        }
+
+        // Pickup cannot be after Function Date
+        if (pickupDate > functionDate) {
+            errors += "Please select a Pickup Date on or before the Function Date.\n";
+            pickupError = true;
+        }
+
+        // **************** Alteration Validation ****************
+        let hasAlteration = rental.rentalHasItemList.some(item => item.alteration_required);
+
+
+        if (hasAlteration) {
+
+            // Function Date must be at least 5 days after Fitton Date
+            let minimumFunctionDate = new Date(fittonDate);
+            minimumFunctionDate.setDate(minimumFunctionDate.getDate() + 5);
+
+            if (functionDate < minimumFunctionDate) {
+                errors += "At least 5 days are required between the Fitton Date and the Function Date for alteration.\n";
+                pickupError = true;
+            }
+
+            // Pickup cannot be the same as Appointment Date
+            if (pickupDate.getTime() === appointmentDate.getTime()) {
+                errors += "Please select a Pickup Date after the Appointment Date because this item requires alteration.\n";
+                pickupError = true;
+            }
+
+            // Pickup cannot be the same as Fitton Date
+            if (pickupDate.getTime() === fittonDate.getTime()) {
+                errors += "Please select a Pickup Date after the Fitton Date because this item requires alteration.\n";
+                pickupError = true;
+            }
+
+            // Pickup cannot be the same as Function Date
+            if (pickupDate.getTime() === functionDate.getTime()) {
+                errors += "Please select a Pickup Date before the Function Date because this item requires alteration.\n";
+                pickupError = true;
+            }
+
+        }
+        // Final Validation
+        if (pickupError) {
+            setInvalid(datePickupElement);
+        } else {
+            setValid(datePickupElement);
+        }
     }
+
+
+    // ******************* Return Date Validation ***********************
+
 
     if (!rental.return_date) {
-        errors += "Please enter valid return date..!\n";
+
+        errors += "Return Date is required.\n";
         setInvalid(dateReturnElement);
+
     } else {
-        setValid(dateReturnElement);
+
+        let returnDate = new Date(dateReturnElement.value);
+
+        let appointmentDate = new Date(dateAppointmentElement.value);
+        let fittonDate = new Date(dateFittonElement.value);
+        let pickupDate = new Date(datePickupElement.value);
+        let functionDate = new Date(dateFunctionElement.value);
+
+        returnDate.setHours(0, 0, 0, 0);
+        appointmentDate.setHours(0, 0, 0, 0);
+        fittonDate.setHours(0, 0, 0, 0);
+        pickupDate.setHours(0, 0, 0, 0);
+        functionDate.setHours(0, 0, 0, 0);
+
+        let returnError = false;
+
+        if (returnDate < appointmentDate) {
+            errors += "Please select a Return Date on or after the Appointment Date.\n";
+            returnError = true;
+        }
+
+        if (returnDate < fittonDate) {
+            errors += "Please select a Return Date on or after the Fitton Date.\n";
+            returnError = true;
+        }
+
+        if (returnDate < pickupDate) {
+            errors += "Please select a Return Date on or after the Pickup Date.\n";
+            returnError = true;
+        }
+
+        if (returnDate < functionDate) {
+            errors += "Please select a Return Date on or after the Function Date.\n";
+            returnError = true;
+        }
+
+        if (returnError) {
+            setInvalid(dateReturnElement);
+        } else {
+            setValid(dateReturnElement);
+        }
+
     }
+
+
     if (!rental.keymoney) {
         errors += "Please enter valid key money amount..!\n";
         setInvalid(textKeyMoneyElement);
@@ -345,11 +419,51 @@ if (!rental.pickup_date) {
     } else {
         setValid(textTotalChargeElement);
     }
+    // ******************* Advance Payment Validation *******************
+
     if (!rental.advance) {
-        errors += "Please enter valid advance amount..!\n";
+
+        errors += "Advance Payment is required.\n";
         setInvalid(textAdvanceElement);
+
     } else {
-        setValid(textAdvanceElement);
+
+        let advance = parseFloat(rental.advance);
+        let totalCharge = parseFloat(rental.total_charge);
+        let keyMoney = parseFloat(rental.keymoney);
+
+        let advanceError = false;
+
+        // Check valid number
+        if (isNaN(advance)) {
+            errors += "Please enter a valid Advance Payment.\n";
+            advanceError = true;
+        }
+
+        // Advance Payment must be at least Rs. 1,000
+        if (advance < 1000) {
+            errors += "Advance Payment must be at least Rs. 1,000.\n";
+            advanceError = true;
+        }
+
+        // Advance Payment cannot exceed Total Charge
+        if (advance > totalCharge) {
+            errors += "Advance Payment cannot exceed the Total Charge.\n";
+            advanceError = true;
+        }
+
+        // Advance Payment cannot exceed Key Money
+        if (advance > keyMoney) {
+            errors += "Advance Payment cannot exceed the Key Money.\n";
+            advanceError = true;
+        }
+
+        // Set Validation Status
+        if (advanceError) {
+            setInvalid(textAdvanceElement);
+        } else {
+            setValid(textAdvanceElement);
+        }
     }
     if (!Array.isArray(rental.rentalHasItemList) || rental.rentalHasItemList.length === 0) {
         errors += "Please add at least one rental item..!\n";
@@ -662,6 +776,8 @@ function refreshRentalInnerTable() {
         { propertyName: getItemName, dataType: "function" },
         { propertyName: "item_price", dataType: "string" },
         { propertyName: "quantity", dataType: "string" },
+        { propertyName: getAlteration, dataType: "function" },
+        { propertyName: getAlterationNote, dataType: "function" },
         { propertyName: getTotal, dataType: "function" }
     ];
     fillDataIntoInnerTable(tableBodySelectedItemsInnerForm, rental.rentalHasItemList, propertyList, refillRentalInnerForm, deleteRentalItem);
@@ -670,6 +786,12 @@ function refreshRentalInnerTable() {
 
 const getAlteration = (obj) => {
     return obj.alteration_required ? "Yes" : "No";
+}
+
+const getAlterationNote = (obj) => {
+    return obj.alteration_required
+        ? (obj.alteration_note || "-")
+        : "-";
 }
 
 const getItem = (obj) => {
@@ -897,4 +1019,165 @@ function filterItemsByCategory() {
         }
 
     };
+}
+
+
+function validateAppointmentDate() {
+
+    let today = new Date();
+    today.setHours(0,0,0,0);
+
+    let appointmentDate = new Date(dateAppointmentElement.value);
+    appointmentDate.setHours(0,0,0,0);
+
+    if (appointmentDate < today) {
+
+        setInvalid(dateAppointmentElement);
+
+    } else {
+
+        setValid(dateAppointmentElement);
+
+    }
+
+}
+
+function validateFunctionDate() {
+
+    if (!dateAppointmentElement.value || !dateFunctionElement.value) return;
+
+    let appointmentDate = new Date(dateAppointmentElement.value);
+    let functionDate = new Date(dateFunctionElement.value);
+
+    appointmentDate.setHours(0,0,0,0);
+    functionDate.setHours(0,0,0,0);
+
+    if (functionDate < appointmentDate) {
+        setInvalid(dateFunctionElement);
+    } else {
+        setValid(dateFunctionElement);
+    }
+
+}
+
+function validateFittonDate() {
+
+    if (!dateAppointmentElement.value || !dateFittonElement.value || !dateFunctionElement.value) return;
+
+    let appointmentDate = new Date(dateAppointmentElement.value);
+    let fittonDate = new Date(dateFittonElement.value);
+    let functionDate = new Date(dateFunctionElement.value);
+
+    appointmentDate.setHours(0,0,0,0);
+    fittonDate.setHours(0,0,0,0);
+    functionDate.setHours(0,0,0,0);
+
+    if (fittonDate < appointmentDate || fittonDate > functionDate) {
+        setInvalid(dateFittonElement);
+    } else {
+        setValid(dateFittonElement);
+    }
+
+}
+
+function validatePickupDate() {
+
+    if (!datePickupElement.value) return;
+
+    let pickupDate = new Date(datePickupElement.value);
+    let appointmentDate = new Date(dateAppointmentElement.value);
+    let fittonDate = new Date(dateFittonElement.value);
+    let functionDate = new Date(dateFunctionElement.value);
+
+    pickupDate.setHours(0,0,0,0);
+    appointmentDate.setHours(0,0,0,0);
+    fittonDate.setHours(0,0,0,0);
+    functionDate.setHours(0,0,0,0);
+
+    let invalid = false;
+
+    if (pickupDate < appointmentDate) invalid = true;
+    if (pickupDate < fittonDate) invalid = true;
+    if (pickupDate > functionDate) invalid = true;
+
+    if (invalid) {
+        setInvalid(datePickupElement);
+    } else {
+        setValid(datePickupElement);
+    }
+
+}
+
+function validateReturnDate() {
+
+    if (!dateReturnElement.value) return;
+
+    let returnDate = new Date(dateReturnElement.value);
+    let pickupDate = new Date(datePickupElement.value);
+
+    returnDate.setHours(0,0,0,0);
+    pickupDate.setHours(0,0,0,0);
+
+    if (returnDate < pickupDate) {
+        setInvalid(dateReturnElement);
+    } else {
+        setValid(dateReturnElement);
+    }
+
+}
+
+function validateAdvance() {
+
+    let advance = Number(textAdvanceElement.value);
+    let totalCharge = Number(textTotalChargeElement.value);
+    let keyMoney = Number(textKeyMoneyElement.value);
+
+    if (textAdvanceElement.value == "") {
+        setInvalid(textAdvanceElement);
+        return;
+    }
+
+    if (advance < 1000) {
+        setInvalid(textAdvanceElement);
+        return;
+    }
+
+    if (advance > totalCharge) {
+        setInvalid(textAdvanceElement);
+        return;
+    }
+
+    if (advance > keyMoney) {
+        setInvalid(textAdvanceElement);
+        return;
+    }
+
+    setValid(textAdvanceElement);
+
+}
+
+function validateKeyMoney() {
+
+    let keyMoney = Number(textKeyMoneyElement.value);
+    let totalCharge = Number(textTotalChargeElement.value);
+    let advance = Number(textAdvanceElement.value);
+
+    if (textKeyMoneyElement.value == "") {
+        setInvalid(textKeyMoneyElement);
+        return;
+    }
+
+    // Key Money cannot exceed Total Charge
+    if (keyMoney > totalCharge) {
+        setInvalid(textKeyMoneyElement);
+        return;
+    }
+
+    // Key Money must be at least the Advance Payment
+    if (keyMoney < advance) {
+        setInvalid(textKeyMoneyElement);
+        return;
+    }
+
+    setValid(textKeyMoneyElement);
 }

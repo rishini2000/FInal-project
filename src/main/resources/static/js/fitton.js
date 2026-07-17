@@ -9,7 +9,8 @@ window.addEventListener("load", () => {
 // Element references
 const searchRentalElement = document.querySelector('#searchRental');
 const hiddenRentalElement = document.querySelector('#selectRental');
-const textCustomerElement = document.querySelector('#textCustomer');
+const searchCustomerElement = document.querySelector("#searchCustomer");
+const hiddenCustomerElement = document.querySelector("#selectCustomer");
 const selectFittonStatusElement = document.querySelector('#selectFittonStatus');
 const dateFittonElement = document.querySelector('#dateFitton');
 const timeFittonElement = document.querySelector('#timeFitton');
@@ -53,6 +54,11 @@ textAlterationNoteElement.addEventListener("keyup", () => {
     innerFitton.alteration_note = textAlterationNoteElement.value;
 });
 
+selectFittonStatusElement.addEventListener("change", () => {
+
+    fitton.fittonStatus = selectFittonStatusElement.value;
+
+});
 //***********start of the main form area************
 
 function refreshFittonForm() {
@@ -65,51 +71,85 @@ function refreshFittonForm() {
     buttonUpdate.style.display = "none";
     buttonSubmit.style.display = "block";
 
-    //rental as datalist
-    let rentals = getServiceRequest("/rental/alldata");
+    let customers = getServiceRequest("/customer/alldata");
+
     populateDataList(
-        document.getElementById("listRental"),
-        searchRentalElement,
-        hiddenRentalElement,
-        rentals,
-        (r) => r.rent_no,
+        document.getElementById("listCustomer"),
+        searchCustomerElement,
+        hiddenCustomerElement,
+        customers,
+        (c) => c.firstname + " " + c.lastname,
         "id"
     );
 
-    //rental code, customer, fitton date fitton time autofill
-    searchRentalElement.addEventListener("input", () => {
-        const val = searchRentalElement.value;
-        const match = rentals.find(r => r.rent_no === val);
-        if (match) {
-            hiddenRentalElement.value = match.id;
+    // Load rental details when customer is selected
+    searchCustomerElement.addEventListener("input", () => {
 
-            textCustomerElement.value =
-                (match.customer_id?.firstname || "") + " " +
-                (match.customer_id?.lastname || "");
+        const customer = customers.find(c =>
+            (c.firstname + " " + c.lastname) === searchCustomerElement.value
+        );
 
-            let rentalItems = [];
-            if (match.rentalHasItemList) {
-                match.rentalHasItemList.forEach(rentalItem => {
-                    if (rentalItem.item_id) rentalItems.push(rentalItem.item_id);
-                });
-            }
-
-            fillDataIntoSelect(
-                selectRentalItemElement,
-                "Select Rental Item",
-                rentalItems,
-                "item_name"
-            );
-
-            dateFittonElement.value = match.fitton_date ? match.fitton_date.substring(0, 10) : "";
-            fitton.fitton_date = match.fitton_date ? match.fitton_date.substring(0, 10) : "";
+        if (!customer) {
+            return;
         }
+
+        hiddenCustomerElement.value = customer.id;
+
+        let rentals = getServiceRequest("/rental/alldata");
+
+
+        const rental = rentals.find(r => {
+
+            console.log(r);
+
+            return r.customer_id.id === customer.id;
+
+        });
+
+        if (!rental) {
+            showToast("No rental found for this customer.", "warning");
+            return;
+        }
+
+        hiddenRentalElement.value = rental.id;
+
+        searchRentalElement.value = rental.rent_no;
+
+        dateFittonElement.value = rental.fitton_date;
+
+        fitton.fitton_date = rental.fitton_date;
+
+        let rentalItems = [];
+
+rental.rentalHasItemList.forEach(ri => {
+    rentalItems.push(ri.item_id);
+});
+
+fillDataIntoSelect(
+    selectRentalItemElement,
+    "Select Item",
+    rentalItems,
+    "item_name"
+);
+
+        // Next step: load rental code, fitton date and items
     });
 
-    fillSelectFromEnum(selectFittonStatusElement, "fittonStatus", "Please select status...!");
+    fillSelectFromEnum(
+        selectFittonStatusElement,
+        "fittonStatus",
+        "Please select status...!"
+    );
+clearElement([
+    dateFittonElement,
+    timeFittonElement,
+    selectFittonStatusElement
+]);
 
-    clearElement([dateFittonElement, timeFittonElement, selectFittonStatusElement, textCustomerElement]);
-    clearValidation(searchRentalElement);
+selectFittonStatusElement.value = "Scheduled";
+fitton.fittonStatus = "Scheduled";
+
+    clearValidation(searchCustomerElement);
 
     document.querySelector('#panelFittonForm .offcanvas-title').textContent = 'New Fitton';
 }
@@ -277,10 +317,14 @@ function refillFittonForm(obj) {
     );
     setSelectedByHiddenId(searchRentalElement, hiddenRentalElement, rentals, (r) => r.rent_no, "id", fitton.rental_id?.id);
 
-    if (fitton.rental_id) {
-        textCustomerElement.value = (fitton.rental_id.customer_id?.firstname || "") + " " + (fitton.rental_id.customer_id?.lastname || "");
-        dateFittonElement.value = fitton.fitton_date ? fitton.fitton_date.substring(0, 10) : "";
-    }
+if (fitton.rental_id) {
+    searchCustomerElement.value =
+        (fitton.rental_id.customer_id?.firstname || "") + " " +
+        (fitton.rental_id.customer_id?.lastname || "");
+
+    dateFittonElement.value =
+        fitton.fitton_date ? fitton.fitton_date.substring(0, 10) : "";
+}
 
     fillSelectFromEnum(selectFittonStatusElement, "fittonStatus", "Please select status...!");
     selectFittonStatusElement.value = fitton.fittonStatus;
@@ -391,7 +435,7 @@ function checkFormError() {
 function buttonInnerFittonSubmit() {
     let errors = checkFormError();
     if (errors == "") {
-        showConfirm("Submit Fitton Detail", "Are you sure to submit the form?", "Submit", "success").then(confirmed => {
+        showConfirm("Added Fitton Detail", "Are you sure to add the form?", "Add", "success").then(confirmed => {
             if (!confirmed) return;
 
             innerFitton.alteration_required = checkAlterationRequiredElement.checked;

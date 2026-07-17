@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import lk.deenproject.common.BaseController;
 import lk.deenproject.fitton.entity.Fitton;
+import lk.deenproject.fitton.entity.FittonHasItem;
 import lk.deenproject.fitton.repository.FittonRepository;
 
 @RestController
@@ -55,14 +56,21 @@ public class FittonController extends BaseController<Fitton, Integer> {
     @PreAuthorize("hasAuthority('FITTON_INSERT')")
     @PostMapping(value = "/fitton/insert")
     public String saveData(@Valid @RequestBody Fitton fitton) {
-        if (fittonDao.existsById(fitton.getId())) {
-            return error("save", "Fitton with the same ID already exists.");
-        }
 
         try {
+
             fitton.setAddeddatetime(LocalDateTime.now());
+
+            if (fitton.getFittonHasItemsList() != null) {
+                for (FittonHasItem item : fitton.getFittonHasItemsList()) {
+                    item.setFitton_id(fitton);
+                }
+            }
+
             fittonDao.save(fitton);
+
             return success();
+
         } catch (Exception e) {
             return error("save", e.getMessage());
         }
