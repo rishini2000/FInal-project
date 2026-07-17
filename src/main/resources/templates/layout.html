@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<body>
+
+    <!-- ====================================================================
+         SIDEBAR FRAGMENT (Desktop - visible on lg+)
+         ==================================================================== -->
+    <aside th:fragment="sidebarFragment" class="sidebar d-none d-lg-flex">
+        <div class="sidebar-header">
+            <a href="/" class="sidebar-brand">
+                <i class="fa-solid fa-scissors"></i>
+                <span>Salon DEEN</span>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <ul class="nav flex-column">
+                <!-- Dashboard -->
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${currentPage == 'home'} ? 'active'" href="/">
+                        <i class="fa-solid fa-gauge-high"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+
+                <!-- Scheduling -->
+                <li class="nav-item nav-group">
+                    <a class="nav-link nav-group-toggle" data-bs-toggle="collapse" href="#sidebarScheduling"
+                       th:classappend="${currentPage == 'appointment' or currentPage == 'leaveplan'} ? '' : 'collapsed'">
+                        <i class="fa-solid fa-calendar-check"></i>
+                        <span>Scheduling</span>
+                        <i class="fa-solid fa-chevron-down group-arrow"></i>
+                    </a>
+                    <div class="collapse" th:classappend="${currentPage == 'appointment' or currentPage == 'leaveplan'} ? 'show'" id="sidebarScheduling">
+                        <ul class="nav flex-column sub-nav">
+                            <li class="nav-item">
+                                <a class="nav-link" th:classappend="${currentPage == 'appointment'} ? 'active'" href="/appointment">
+                                    <i class="fa-solid fa-clock"></i>
+                                    <span>Appointment</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" th:classappend="${currentPage == 'leaveplan'} ? 'active'" href="/leaveplan">
+                                    <i class="fa-solid fa-plane-departure"></i>
+                                    <span>Leave Plan</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
+                <!-- Customers -->
+                <li class="nav-item nav-group">
+                    <a class="nav-link nav-group-toggle" data-bs-toggle="collapse" href="#sidebarCustomers"
+                       th:classappend="${currentPage == 'customer' or currentPage == 'payment'} ? '' : 'collapsed'">
+                        <i class="fa-solid fa-user-group"></i>
+                        <span>Customers</span>
+                        <i class="fa-solid fa-chevron-down group-arrow"></i>
+                    </a>
+                    <div class="collapse" th:classappend="${currentPage == 'customer' or currentPage == 'payment'} ? 'show'" id="sidebarCustomers">
+                        <ul class="nav flex-column sub-nav">
+                            <li class="nav-item">
+                                <a class="nav-link" th:classappend="${currentPage == 'customer'} ? 'active'" href="/customer">
+                                    <i class="fa-solid fa-address-book"></i>
+                                    <span>Customer</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" th:classappend="${currentPage == 'payment'} ? 'active'" href="/payment">
+                                    <i class="fa-solid fa-credit-card"></i>
+                                    <span>Payment</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
+                <!-- Workflow -->
+                <li class="nav-item nav-group">
+                    <a class="nav-link nav-group-toggle" data-bs-toggle="collapse" href="#sidebarWorkflow"
+                       th:classappend="${currentPage == 'fitton' or currentPage == 'pickup' or currentPage == 'handover'} ? '' : 'collapsed'">
+                        <i class="fa-solid fa-clipboard-list"></i>
+                        <span>Workflow</span>
+                        <i class="fa-solid fa-chevron-down group-arrow"></i>
+                    </a>
+                    <div class="collapse" th:classappend="${currentPage == 'fitton' or currentPage == 'pickup' or currentPage == 'handover'} ? 'show'" id="sidebarWorkflow">
+                        <ul class="nav flex-column sub-nav">
+                            <li class="nav-item">
+                                <a class="nav-link" th:classappend="${currentPage == 'fitton'} ? 'active'" href="/fitton">
+                                    <i class="fa-solid fa-person-dress"></i>
+                                    <span>Fitton</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" th:classappend="${currentPage == 'pickup'} ? 'active'" href="/pickup">
+                                    <i class="fa-solid fa-hand-holding"></i>
+                                    <span>Pickup</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" th:classappend="${currentPage == 'handover'} ? 'active'" href="/handover">
+                                    <i class="fa-solid fa-rotate-left"></i>
+                                    <span>Handover</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
+                <!-- Reports -->
+                <li class="nav-item nav-group">
+                    <a class="nav-link nav-group-toggle" data-bs-toggle="collapse" href="#sidebarReports"
+                       th:classappend="${currentPage == 'revenue' or currentPage == 'appointments' or currentPage == 'rentals'} ? '' : 'collapsed'">
+                        <i class="fa-solid fa-chart-bar"></i>
+                        <span>Reports</span>
+                        <i class="fa-solid fa-chevron-down group-arrow"></i>
+                    </a>
+                    <div class="collapse" th:classappend="${currentPage == 'revenue' or currentPage == 'appointments' or currentPage == 'rentals'} ? 'show'" id="sidebarReports">
+                        <ul class="nav flex-column sub-nav">
+                            <li class="nav-item">
+                                <a class="nav-link" th:classappend="${currentPage == 'revenue'} ? 'active'" href="/reports/revenue">
+                                    <i class="fa-solid fa-chart-line"></i>
+                                    <span>Revenue</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" th:classappend="${currentPage == 'appointments'} ? 'active'" href="/reports/appointments">
+                                    <i class="fa-solid fa-calendar-check"></i>
+                                    <span>Appointments</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" th:classappend="${currentPage == 'rentals'} ? 'active'" href="/reports/rentals">
+                                    <i class="fa-solid fa-truck"></i>
+                                    <span>Rentals</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
+                <!-- Services -->
+                <li class="nav-item nav-group">
+                    <a class="nav-link nav-group-toggle" data-bs-toggle="collapse" href="#sidebarServices"
+                       th:classappend="${currentPage == 'service' or currentPage == 'service_package'} ? '' : 'collapsed'">
+                        <i class="fa-solid fa-spa"></i>
+                        <span>Services</span>
+                        <i class="fa-solid fa-chevron-down group-arrow"></i>
+                    </a>
+                    <div class="collapse" th:classappend="${currentPage == 'service' or currentPage == 'service_package'} ? 'show'" id="sidebarServices">
+                        <ul class="nav flex-column sub-nav">
+                            <li class="nav-item">
+                                <a class="nav-link" th:classappend="${currentPage == 'service'} ? 'active'" href="/service">
+                                    <i class="fa-solid fa-hand-sparkles"></i>
+                                    <span>Service</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" th:classappend="${currentPage == 'service_package'} ? 'active'" href="/service_package">
+                                    <i class="fa-solid fa-box-open"></i>
+                                    <span>Service Package</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
+                <!-- Inventory -->
+                <li class="nav-item nav-group">
+                    <a class="nav-link nav-group-toggle" data-bs-toggle="collapse" href="#sidebarInventory"
+                       th:classappend="${currentPage == 'item' or currentPage == 'rental'} ? '' : 'collapsed'">
+                        <i class="fa-solid fa-shirt"></i>
+                        <span>Inventory</span>
+                        <i class="fa-solid fa-chevron-down group-arrow"></i>
+                    </a>
+                    <div class="collapse" th:classappend="${currentPage == 'item' or currentPage == 'rental'} ? 'show'" id="sidebarInventory">
+                        <ul class="nav flex-column sub-nav">
+                            <li class="nav-item">
+                                <a class="nav-link" th:classappend="${currentPage == 'item'} ? 'active'" href="/item">
+                                    <i class="fa-solid fa-boxes-stacked"></i>
+                                    <span>Item</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" th:classappend="${currentPage == 'rental'} ? 'active'" href="/rental">
+                                    <i class="fa-solid fa-truck"></i>
+                                    <span>Rental</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
+                <!-- Administration -->
+                <li class="nav-item nav-group">
+                    <a class="nav-link nav-group-toggle" data-bs-toggle="collapse" href="#sidebarAdmin"
+                       th:classappend="${currentPage == 'employee' or currentPage == 'user' or currentPage == 'privilage'} ? '' : 'collapsed'">
+                        <i class="fa-solid fa-users-gear"></i>
+                        <span>Administration</span>
+                        <i class="fa-solid fa-chevron-down group-arrow"></i>
+                    </a>
+                    <div class="collapse" th:classappend="${currentPage == 'employee' or currentPage == 'user' or currentPage == 'privilage'} ? 'show'" id="sidebarAdmin">
+                        <ul class="nav flex-column sub-nav">
+                            <li class="nav-item">
+                                <a class="nav-link" th:classappend="${currentPage == 'employee'} ? 'active'" href="/employee">
+                                    <i class="fa-solid fa-user-tie"></i>
+                                    <span>Employee</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" th:classappend="${currentPage == 'user'} ? 'active'" href="/user">
+                                    <i class="fa-solid fa-user-shield"></i>
+                                    <span>User</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" th:classappend="${currentPage == 'privilage'} ? 'active'" href="/privilage">
+                                    <i class="fa-solid fa-key"></i>
+                                    <span>Privilage</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+
+    <!-- ====================================================================
+         SIDEBAR OFFCANVAS FRAGMENT (Mobile - visible below lg)
+         ==================================================================== -->
+    <div th:fragment="sidebarOffcanvasFragment" class="offcanvas offcanvas-start sidebar-offcanvas" tabindex="-1"
+         id="sidebarOffcanvas" aria-labelledby="sidebarOffcanvasLabel">
+        <div class="offcanvas-header">
+            <a href="/" class="sidebar-brand">
+                <i class="fa-solid fa-scissors"></i>
+                <span>Salon DEEN</span>
+            </a>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <nav class="sidebar-nav">
+                <ul class="nav flex-column">
+                    <!-- Dashboard -->
+                    <li class="nav-item">
+                        <a class="nav-link" th:classappend="${currentPage == 'home'} ? 'active'" href="/">
+                            <i class="fa-solid fa-gauge-high"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+
+                    <!-- Scheduling -->
+                    <li class="nav-item nav-group">
+                        <a class="nav-link nav-group-toggle" data-bs-toggle="collapse" href="#mobileScheduling">
+                            <i class="fa-solid fa-calendar-check"></i>
+                            <span>Scheduling</span>
+                            <i class="fa-solid fa-chevron-down group-arrow"></i>
+                        </a>
+                        <div class="collapse" id="mobileScheduling">
+                            <ul class="nav flex-column sub-nav">
+                                <li class="nav-item"><a class="nav-link" href="/appointment"><i class="fa-solid fa-clock"></i><span>Appointment</span></a></li>
+                                <li class="nav-item"><a class="nav-link" href="/leaveplan"><i class="fa-solid fa-plane-departure"></i><span>Leave Plan</span></a></li>
+                            </ul>
+                        </div>
+                    </li>
+
+                    <!-- Customers -->
+                    <li class="nav-item nav-group">
+                        <a class="nav-link nav-group-toggle" data-bs-toggle="collapse" href="#mobileCustomers">
+                            <i class="fa-solid fa-user-group"></i>
+                            <span>Customers</span>
+                            <i class="fa-solid fa-chevron-down group-arrow"></i>
+                        </a>
+                        <div class="collapse" id="mobileCustomers">
+                            <ul class="nav flex-column sub-nav">
+                                <li class="nav-item"><a class="nav-link" href="/customer"><i class="fa-solid fa-address-book"></i><span>Customer</span></a></li>
+                                <li class="nav-item"><a class="nav-link" href="/payment"><i class="fa-solid fa-credit-card"></i><span>Payment</span></a></li>
+                            </ul>
+                        </div>
+                    </li>
+
+                    <!-- Workflow -->
+                    <li class="nav-item nav-group">
+                        <a class="nav-link nav-group-toggle" data-bs-toggle="collapse" href="#mobileWorkflow">
+                            <i class="fa-solid fa-clipboard-list"></i>
+                            <span>Workflow</span>
+                            <i class="fa-solid fa-chevron-down group-arrow"></i>
+                        </a>
+                        <div class="collapse" id="mobileWorkflow">
+                            <ul class="nav flex-column sub-nav">
+                                <li class="nav-item"><a class="nav-link" href="/fitton"><i class="fa-solid fa-person-dress"></i><span>Fitton</span></a></li>
+                                <li class="nav-item"><a class="nav-link" href="/pickup"><i class="fa-solid fa-hand-holding"></i><span>Pickup</span></a></li>
+                                <li class="nav-item"><a class="nav-link" href="/handover"><i class="fa-solid fa-rotate-left"></i><span>Handover</span></a></li>
+                            </ul>
+                        </div>
+                    </li>
+
+                    <!-- Reports -->
+                    <li class="nav-item nav-group">
+                        <a class="nav-link nav-group-toggle" data-bs-toggle="collapse" href="#mobileReports">
+                            <i class="fa-solid fa-chart-bar"></i>
+                            <span>Reports</span>
+                            <i class="fa-solid fa-chevron-down group-arrow"></i>
+                        </a>
+                        <div class="collapse" id="mobileReports">
+                            <ul class="nav flex-column sub-nav">
+                                <li class="nav-item"><a class="nav-link" href="/reports/revenue"><i class="fa-solid fa-chart-line"></i><span>Revenue</span></a></li>
+                                <li class="nav-item"><a class="nav-link" href="/reports/appointments"><i class="fa-solid fa-calendar-check"></i><span>Appointments</span></a></li>
+                                <li class="nav-item"><a class="nav-link" href="/reports/rentals"><i class="fa-solid fa-truck"></i><span>Rentals</span></a></li>
+                            </ul>
+                        </div>
+                    </li>
+
+                    <!-- Services -->
+                    <li class="nav-item nav-group">
+                        <a class="nav-link nav-group-toggle" data-bs-toggle="collapse" href="#mobileServices">
+                            <i class="fa-solid fa-spa"></i>
+                            <span>Services</span>
+                            <i class="fa-solid fa-chevron-down group-arrow"></i>
+                        </a>
+                        <div class="collapse" id="mobileServices">
+                            <ul class="nav flex-column sub-nav">
+                                <li class="nav-item"><a class="nav-link" href="/service"><i class="fa-solid fa-hand-sparkles"></i><span>Service</span></a></li>
+                                <li class="nav-item"><a class="nav-link" href="/service_package"><i class="fa-solid fa-box-open"></i><span>Service Package</span></a></li>
+                            </ul>
+                        </div>
+                    </li>
+
+                    <!-- Inventory -->
+                    <li class="nav-item nav-group">
+                        <a class="nav-link nav-group-toggle" data-bs-toggle="collapse" href="#mobileInventory">
+                            <i class="fa-solid fa-shirt"></i>
+                            <span>Inventory</span>
+                            <i class="fa-solid fa-chevron-down group-arrow"></i>
+                        </a>
+                        <div class="collapse" id="mobileInventory">
+                            <ul class="nav flex-column sub-nav">
+                                <li class="nav-item"><a class="nav-link" href="/item"><i class="fa-solid fa-boxes-stacked"></i><span>Item</span></a></li>
+                                <li class="nav-item"><a class="nav-link" href="/rental"><i class="fa-solid fa-truck"></i><span>Rental</span></a></li>
+                            </ul>
+                        </div>
+                    </li>
+
+                    <!-- Administration -->
+                    <li class="nav-item nav-group">
+                        <a class="nav-link nav-group-toggle" data-bs-toggle="collapse" href="#mobileAdmin">
+                            <i class="fa-solid fa-users-gear"></i>
+                            <span>Administration</span>
+                            <i class="fa-solid fa-chevron-down group-arrow"></i>
+                        </a>
+                        <div class="collapse" id="mobileAdmin">
+                            <ul class="nav flex-column sub-nav">
+                                <li class="nav-item"><a class="nav-link" href="/employee"><i class="fa-solid fa-user-tie"></i><span>Employee</span></a></li>
+                                <li class="nav-item"><a class="nav-link" href="/user"><i class="fa-solid fa-user-shield"></i><span>User</span></a></li>
+                                <li class="nav-item"><a class="nav-link" href="/privilage"><i class="fa-solid fa-key"></i><span>Privilage</span></a></li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+
+    <!-- ====================================================================
+         TOP BAR FRAGMENT
+         ==================================================================== -->
+    <header th:fragment="topbarFragment(pageTitle)" class="top-bar">
+        <div class="top-bar-left">
+            <button class="btn sidebar-toggle d-lg-none" type="button" data-bs-toggle="offcanvas"
+                    data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            <h1 class="page-title" th:text="${pageTitle}">Page Title</h1>
+        </div>
+        <div class="top-bar-right">
+            <span class="user-greeting" sec:authorize="isAuthenticated()">
+                <i class="fa-solid fa-circle-user"></i>
+                <span sec:authentication="name">User</span>
+            </span>
+            <form th:action="@{/logout}" method="post" class="d-inline">
+                <button type="submit" class="btn btn-logout" title="Logout">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
+            </form>
+        </div>
+    </header>
+
+
+</body>
+</html>

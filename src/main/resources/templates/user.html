@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{header :: headerFragment}"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+
+<body>
+    <div class="app-layout">
+        <aside class="sidebar d-none d-lg-flex" th:replace="~{layout :: sidebarFragment}"></aside>
+        <div th:replace="~{layout :: sidebarOffcanvasFragment}"></div>
+
+        <div class="main-content">
+            <header th:replace="~{layout :: topbarFragment('User Management')}"></header>
+
+            <div class="content-wrapper">
+                <div class="card mb-3">
+                    <div class="card-header title">
+                        <div class="row align-items-center">
+                            <div class="col text-start">
+                                <h2 class="table-title">User Management</h2>
+                            </div>
+                            <div class="col text-end header-actions">
+                                <button type="button" class="btn my-custom-employee-button" data-bs-toggle="offcanvas"
+                                    data-bs-target="#panelUserForm" onclick="refreshUserForm();">
+                                    <i class="fa-solid fa-plus"></i> Add New User
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="offcanvas offcanvas-end offcanvas-panel" id="panelUserForm" data-bs-backdrop="true">
+                    <div class="offcanvas-header">
+                        <h5 class="offcanvas-title">New User</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+                    </div>
+                    <div class="offcanvas-body">
+                        <form id="formUser" onsubmit="return false;">
+                            <h6 class="form-section-title"><i class="fa-solid fa-user-plus me-2"></i>User Account</h6>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold"><i class="fa-solid fa-user me-1"></i>Employee <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
+                                        <input type="text" id="searchEmployee" class="form-control" placeholder="Search employee..." list="listEmployee">
+                                        <datalist id="listEmployee"></datalist>
+                                        <input type="hidden" id="selectEmployee">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label for="textUsername" class="form-label fw-bold"><i class="fa-solid fa-at me-1"></i>Username <span class="text-danger">*</span></label>
+                                    <input type="text" id="textUsername" required placeholder="Enter Username"
+                                        class="form-control input-element" />
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label for="textPassword" class="form-label fw-bold"><i class="fa-solid fa-lock me-1"></i>Password <span class="text-danger">*</span></label>
+                                    <div class="input-group password-toggle">
+                                        <input type="password" id="textPassword" required placeholder="Min 6 characters" class="form-control input-element">
+                                        <button type="button" class="btn-password-toggle" onclick="togglePassword(this)"><i class="fa-solid fa-eye"></i></button>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label for="textRetypePassword" class="form-label fw-bold"><i class="fa-solid fa-lock me-1"></i>Retype Password <span class="text-danger">*</span></label>
+                                    <div class="input-group password-toggle">
+                                        <input type="password" id="textRetypePassword" required placeholder="Retype Password" class="form-control input-element">
+                                        <button type="button" class="btn-password-toggle" onclick="togglePassword(this)"><i class="fa-solid fa-eye"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="form-section-divider">
+                            <h6 class="form-section-title"><i class="fa-solid fa-user-tag me-2"></i>Roles & Status</h6>
+                            <div class="row g-3">
+                                <div class="col-12" id="divRole"></div>
+
+                                <div class="col-md-4">
+                                    <div class="form-check form-switch">
+                                        <input type="checkbox" role="switch" id="checkUserStatus" class="form-check-input">
+                                        <label for="checkUserStatus" class="form-check-label" id="lblUserStatus">User Account Active</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="form-section-divider">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label for="textNotes" class="form-label fw-bold"><i class="fa-solid fa-sticky-note me-1"></i>Notes</label>
+                                    <textarea id="textNotes" placeholder="Optional notes about the user"
+                                        class="form-control input-element" rows="3"></textarea>
+                                </div>
+                            </div>
+                        </form>
+
+                        <div class="panel-footer">
+                            <button type="button" id="buttonClear" class="btn-clear"
+                                onclick="document.getElementById('formUser')?.reset()">Clear</button>
+                            <button type="button" id="buttonUpdate" class="btn-update"
+                                onclick="updateUserForm();">Update</button>
+                            <button type="button" id="buttonSubmit" class="btn-submit"
+                                onclick="submitUserForm();">Submit</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row m-2">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <table class="modern-table">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Employee</th>
+                                            <th>Username</th>
+                                            <th>Role</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tableBodyUser" class="tablebody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{footer :: footerFragment}"></div>
+    <script src="/js/user.js"></script>
+</body>
+
+</html>

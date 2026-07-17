@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{header :: headerFragment}"></head>
+
+<body>
+    <div class="app-layout">
+        <!-- Desktop Sidebar -->
+        <aside class="sidebar d-none d-lg-flex" th:replace="~{layout :: sidebarFragment}"></aside>
+
+        <!-- Mobile Offcanvas Sidebar -->
+        <div th:replace="~{layout :: sidebarOffcanvasFragment}"></div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <header th:replace="~{layout :: topbarFragment('Payment Management')}"></header>
+
+            <!-- Page Content -->
+            <div class="content-wrapper">
+                <!-- Page Title Card with Add Button -->
+                <div class="card mb-3">
+                    <div class="card-header title">
+                        <div class="row align-items-center">
+                            <div class="col text-start">
+                                <h2 class="table-title">Payment Management</h2>
+                            </div>
+                            <div class="col text-end header-actions">
+                                <button type="button" class="btn my-custom-employee-button" data-bs-toggle="offcanvas"
+                                    data-bs-target="#panelPaymentForm">
+                                    <i class="fa-solid fa-plus"></i> Add New Payment
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="offcanvas offcanvas-end offcanvas-panel" id="panelPaymentForm" data-bs-backdrop="true">
+                    <div class="offcanvas-header">
+                        <h5 class="offcanvas-title">New Payment</h5>
+                        <button class="btn-close" data-bs-dismiss="offcanvas"></button>
+                    </div>
+                    <div class="offcanvas-body">
+                        <form id="formPayment" onsubmit="return false;">
+                            <!-- Section: Payment Details -->
+                            <h6 class="form-section-title"><i class="fa-solid fa-credit-card me-2"></i>Payment Details</h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="searchAppointment" class="form-label fw-bold">Appointment <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
+                                        <input type="text" id="searchAppointment" class="form-control" placeholder="Search appointment..." list="listAppointment">
+                                        <datalist id="listAppointment"></datalist>
+                                        <input type="hidden" id="textAppointmentId">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="textAppointmentAmount" class="form-label fw-bold">Appointment Amount <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text currency">Rs.</span>
+                                        <input type="number" min="0" id="textAppointmentAmount" required placeholder="0.00" class="form-control input-element" step="0.01">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="textPayAmount" class="form-label fw-bold">Pay Amount <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text currency">Rs.</span>
+                                        <input type="number" min="0" id="textPayAmount" required placeholder="0.00" class="form-control input-element" step="0.01">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="textPayBalanceAmount" class="form-label fw-bold">Balance Amount <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text currency">Rs.</span>
+                                        <input type="number" min="0" id="textPayBalanceAmount" required placeholder="0.00" class="form-control input-element readonly-calculated" readonly>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section: Payment Method -->
+                            <hr class="form-section-divider">
+                            <h6 class="form-section-title"><i class="fa-solid fa-money-bill-wave me-2"></i>Payment Method</h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="selectPaymentMethod" class="form-label fw-bold">Payment Method <span class="text-danger">*</span></label>
+                                    <select id="selectPaymentMethod" required class="form-select input-element">
+                                        <option value="" selected disabled>-- Select Method --</option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label for="textPaymentNote" class="form-label fw-bold">Notes</label>
+                                    <textarea id="textPaymentNote" placeholder="Optional note" class="form-control input-element" rows="2"></textarea>
+                                </div>
+                            </div>
+                        </form>
+
+                        <div class="panel-footer">
+                            <button type="button" id="buttonClear" class="btn-clear"
+                                onclick="document.getElementById('formPayment')?.reset()">Clear</button>
+                            <button type="button" id="buttonUpdate" class="btn-update" style="display:none;"
+                                onclick="buttonPaymentUpdate();">Update</button>
+                            <button type="button" id="buttonSubmit" class="btn-submit"
+                                onclick="buttonPaymentSubmit();">Submit</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- start table area -->
+                <div class="row m-2">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <table class="modern-table">
+                                    <thead>
+                                        <tr>
+                                            <th> No </th>
+                                            <th> Appointment </th>
+                                            <th> Appointment Amount </th>
+                                            <th> Pay Amount </th>
+                                            <th> Pay Balance Amount </th>
+                                            <th> Method </th>
+                                            <th> Note </th>
+                                            <th> Action </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tableBodyPayment" class="tablebody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end table area -->
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{footer :: footerFragment}"></div>
+    <script src="/js/payment.js"></script>
+</body>
+
+</html>

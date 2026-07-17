@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{header :: headerFragment}"></head>
+
+<body>
+    <div class="app-layout">
+        <!-- Desktop Sidebar -->
+        <aside class="sidebar d-none d-lg-flex" th:replace="~{layout :: sidebarFragment}"></aside>
+
+        <!-- Mobile Offcanvas Sidebar -->
+        <div th:replace="~{layout :: sidebarOffcanvasFragment}"></div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <header th:replace="~{layout :: topbarFragment('Fitton Management')}"></header>
+
+            <!-- Page Content -->
+            <div class="content-wrapper">
+                <!-- Page Title Card with Add Button -->
+                <div class="card mb-3">
+                    <div class="card-header title">
+                        <div class="row align-items-center">
+                            <div class="col text-start">
+                                <h2 class="table-title">Fitton Management</h2>
+                            </div>
+                            <div class="col text-end header-actions">
+                                <button type="button" class="btn my-custom-employee-button" data-bs-toggle="offcanvas"
+                                    data-bs-target="#panelFittonForm">
+                                    <i class="fa-solid fa-plus"></i> Add New Fitton
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="offcanvas offcanvas-end offcanvas-panel" id="panelFittonForm" data-bs-backdrop="true">
+                    <div class="offcanvas-header">
+                        <h5 class="offcanvas-title">New Fitton</h5>
+                        <button class="btn-close" data-bs-dismiss="offcanvas"></button>
+                    </div>
+                    <div class="offcanvas-body">
+                        <form id="formFitton" onsubmit="return false;">
+                            <!-- Section: Fitton Details -->
+                            <h6 class="form-section-title"><i class="fa-solid fa-scissors me-2"></i>Fitton Details</h6>
+                            <div class="row g-3">
+
+                                        <div class="col-md-6">
+                                            <label for="searchRental" class="form-label fw-bold">Rental <span class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
+                                                <input type="text" id="searchRental" class="form-control" placeholder="Search rental..." list="listRental">
+                                                <datalist id="listRental"></datalist>
+                                                <input type="hidden" id="selectRental">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label for="textCustomer" class="form-label fw-bold">Customer</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+                                                <input type="text" id="textCustomer" class="form-control input-element" placeholder="Auto-filled from rental" readonly />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Section: Schedule -->
+                                    <hr class="form-section-divider">
+                                    <h6 class="form-section-title"><i class="fa-solid fa-clock me-2"></i>Schedule</h6>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label for="dateFitton" class="form-label fw-bold">Fitton Date <span class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fa-solid fa-calendar-days"></i></span>
+                                                <input type="date" id="dateFitton" required class="form-control input-element" />
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label for="timeFitton" class="form-label fw-bold">Fitton Time <span class="text-danger">*</span></label>
+                                            <input type="time" id="timeFitton" required class="form-control input-element" />
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label for="selectFittonStatus" class="form-label fw-bold">Fitton Status <span class="text-danger">*</span></label>
+                                            <select id="selectFittonStatus" class="form-select input-element" required>
+                                                <option value="" selected disabled>-- Select Status --</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Section: Rental Items & Alterations -->
+                                    <hr class="form-section-divider">
+                                        <div class="inner-section-header">
+                                            <h6><i class="fa-solid fa-box-open me-2"></i>Rental Items & Alterations</h6>
+                                            <button type="button" class="btn btn-sm btn-primary" id="buttonAddFittonItem">Add Item</button>
+                                        </div>
+                                        <div class="inner-table-container">
+                                            <div class="inner-controls">
+                                                <div class="row g-3 mb-3 align-items-end">
+                                                    <div class="col-md-4">
+                                                        <label for="selectRentalItem" class="form-label fw-bold">Rental Item</label>
+                                                        <select id="selectRentalItem" class="form-select input-element">
+                                                            <option value="" selected disabled>-- Select Item --</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <label class="form-label fw-bold">Alteration Required</label>
+                                                        <div class="form-check form-switch mt-2">
+                                                            <input class="form-check-input" type="checkbox" id="checkAlterationRequired">
+                                                            <label class="form-check-label" for="checkAlterationRequired">Yes</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label for="textAlterationNote" class="form-label fw-bold">Alteration Note</label>
+                                                        <input type="text" id="textAlterationNote" class="form-control input-element" placeholder="Enter alteration details (if required)" disabled>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <table class="modern-table">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>No</th>
+                                                        <th>Item</th>
+                                                        <th>Alteration Required</th>
+                                                        <th>Alteration Note</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="tableBodySelectedRentalItemsInnerForm" class="tablebody">
+                                                    <!-- Populated by JS -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                </form>
+
+                                <div class="panel-footer">
+                                    <button type="button" id="buttonClear" class="btn-clear" onclick="refreshFittonForm()">Clear</button>
+                                    <button type="button" id="buttonUpdate" class="btn-update" style="display:none;" onclick="updateFittonForm()">Update</button>
+                                    <button type="button" id="buttonSubmit" class="btn-submit" onclick="submitFittonForm()">Submit</button>
+                                </div>
+                            </div>
+                        </div>
+
+                <!-- start table area -->
+                <div class="row m-2">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <table class="modern-table">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Rental No</th>
+                                            <th>Fitton Date</th>
+                                            <th>Fitton Time</th>
+                                            <th>Fitton Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tableBodyFitton" class="tablebody">
+                                        <!-- Table rows will be populated dynamically by fitton.js -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end table area -->
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{footer :: footerFragment}"></div>
+    <script src="/js/fitton.js"></script>
+</body>
+
+</html>

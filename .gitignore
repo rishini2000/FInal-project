@@ -1,0 +1,9 @@
+build/
+.gradle/
+.DS_Store
+*.DS_Store
+*.zip
+.hintrc
+.idea/
+*.iml
+out/

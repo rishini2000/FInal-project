@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <th:block th:replace="~{header :: headerFragment}"></th:block>
+</head>
+
+<body>
+    <div class="app-layout">
+        <!-- Desktop Sidebar -->
+        <aside class="sidebar d-none d-lg-flex" th:replace="~{layout :: sidebarFragment}"></aside>
+
+        <!-- Mobile Offcanvas Sidebar -->
+        <div th:replace="~{layout :: sidebarOffcanvasFragment}"></div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <header th:replace="~{layout :: topbarFragment('Employee Management')}"></header>
+
+            <!-- Page Content -->
+            <div class="content-wrapper">
+                <!-- Page Title Card with Add Button -->
+                <div class="card mb-3">
+                    <div class="card-header title">
+                        <div class="row align-items-center">
+                            <div class="col text-start">
+                                <h2 class="table-title">Employee Management</h2>
+                            </div>
+                            <div class="col text-end header-actions">
+                                <button type="button" class="btn my-custom-employee-button" data-bs-toggle="offcanvas"
+                                    data-bs-target="#panelEmployeeForm" onclick="refreshEmployeeForm()">
+                                    <i class="fa-solid fa-plus"></i> Add New Employee
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Employee Form Modal -->
+                <div class="offcanvas offcanvas-end offcanvas-panel" id="panelEmployeeForm" data-bs-backdrop="true">
+                    <div class="offcanvas-header">
+                        <h5 class="offcanvas-title">New Employee</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+                    </div>
+                    <div class="offcanvas-body">
+                        <form id="formEmployee" onsubmit="return false;">
+
+                            <!-- Auto-generated code (edit only) -->
+                            <div class="code-display mb-3" id="empCodeDisplay" style="display:none;">
+                                <span class="code-label">Employee No</span>
+                                <span id="empCodeValue"></span>
+                            </div>
+
+                            <h6 class="form-section-title"><i class="fa-solid fa-user me-2"></i>Personal Details</h6>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="textFullName" class="form-label"><i
+                                            class="fa-solid fa-user me-1"></i>Full Name <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" id="textFullName" required placeholder="e.g. Kasun Perera"
+                                        class="form-control input-element">
+                                    <div class="invalid-feedback">
+                                        Enter 2 or 3 names. Each name must start with a capital letter and contain only
+                                        letters. Single-letter middle names such as "D" are allowed.</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="selectCallingName" class="form-label"><i
+                                            class="fa-solid fa-user-tag me-1"></i>Calling Name <span
+                                            class="text-danger">*</span></label>
+                                    <select name="callingname"
+                                        onchange="employee.callingname = this.value; setValid(this);" required
+                                        id="selectCallingName" class="form-select input-element">
+                                        <option value="" selected disabled>-- Type full name first --</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="textNIC" class="form-label"><i class="fa-solid fa-id-card me-1"></i>NIC
+                                        <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-solid fa-id-card"></i></span>
+                                        <input type="text" id="textNIC" required
+                                            placeholder="e.g. 956789123V or 199567890123"
+                                            class="form-control input-element">
+                                    </div>
+                                    <div class="invalid-feedback">Please enter a valid NIC.</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="dateDOB" class="form-label"><i
+                                            class="fa-regular fa-calendar me-1"></i>Date of Birth <span
+                                            class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-regular fa-calendar"></i></span>
+                                        <input type="date" onkeydown="return false" id="dateDOB" required
+                                            class="form-control input-element">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="form-section-divider">
+                            <h6 class="form-section-title"><i class="fa-solid fa-address-book me-2"></i>Contact</h6>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="textMobile" class="form-label"><i
+                                            class="fa-solid fa-phone me-1"></i>Mobile <span
+                                            class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
+                                        <input type="text" id="textMobile" inputmode="numeric" required
+                                            placeholder="e.g. 0711234567" class="form-control input-element"
+                                            onkeyup="textValidator(this,'^07[01245678][0-9]{7}$',employee,'mobile')">
+                                    </div>
+                                    <div class="invalid-feedback">Please enter a valid mobile number.</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="textEmail" class="form-label"><i
+                                            class="fa-solid fa-envelope me-1"></i>Email <span
+                                            class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">@</span>
+                                        <input type="email" id="textEmail" required maxlength="100"
+                                            placeholder="e.g. kasun@email.com" class="form-control input-element"
+                                            onkeyup="textValidator(this,'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$',employee,'email')">
+                                    </div>
+                                    <div class="invalid-feedback">Please enter a valid email address.</div>
+                                </div>
+                            </div>
+
+                            <hr class="form-section-divider">
+                            <h6 class="form-section-title"><i class="fa-solid fa-briefcase me-2"></i>Employment</h6>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="selectDesignation" class="form-label"><i
+                                            class="fa-solid fa-briefcase me-1"></i>Designation <span
+                                            class="text-danger">*</span></label>
+                                    <select id="selectDesignation" class="form-select input-element"
+                                        onchange="if(typeof employee !== 'undefined'){ employee.designation = this.value; setValid(this); }"
+                                        required>
+                                        <option value="" selected disabled>-- Select Designation --</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="selectEmployeeStatus" class="form-label"><i
+                                            class="fa-solid fa-toggle-on me-1"></i>Status <span
+                                            class="text-danger">*</span></label>
+                                    <select id="selectEmployeeStatus" class="form-select input-element"
+                                        onchange="if(typeof employee !== 'undefined'){ employee.employeeStatus = this.value; setValid(this); }"
+                                        required>
+                                        <option value="" selected disabled>-- Select Status --</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <hr class="form-section-divider">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label for="textAddress" class="form-label">
+                                        <i class="fa-solid fa-location-dot me-1"></i>
+                                        Address <span class="text-danger">*</span>
+                                    </label>
+                                    <textarea id="textAddress" required placeholder="Enter address"
+                                        class="form-control input-element" rows="2" maxlength="255"
+                                        onkeyup="textValidator(this,'^[A-Za-z0-9 ,./()-]{5,255}$',employee,'address')"></textarea>
+                                    <div class="invalid-feedback">Please enter a valid address.</div>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="panel-footer">
+                            <button type="button" id="buttonClear" class="btn-clear"
+                                onclick="refreshEmployeeForm()">Clear</button>
+                            <button type="button" id="buttonUpdate" class="btn-update" onclick="updateEmployeeForm();"
+                                style="display:none;">Update</button>
+                            <button type="button" id="buttonSubmit" class="btn-submit"
+                                onclick="submitEmployeeForm();">Submit</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Employee Table -->
+                <div class="card">
+                    <div class="card-body">
+                        <table class="modern-table" id="employeeTable">
+                            <thead>
+                                <tr>
+                                    <th class="col-center">#</th>
+                                    <th class="col-text">Employee</th>
+                                    <th class="col-text">NIC</th>
+                                    <th class="col-text">Contact</th>
+                                    <th class="col-center">DOB</th>
+                                    <th class="col-center">Age</th>
+                                    <th class="col-center">Designation</th>
+                                    <th class="col-center">Status</th>
+                                    <th class="col-actions">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBodyEmployee">
+                                <!-- Data loaded via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{footer :: footerFragment}"></div>
+    <script src="/js/employee.js"></script>
+</body>
+
+</html>
