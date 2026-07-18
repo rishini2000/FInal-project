@@ -240,10 +240,10 @@ INSERT IGNORE INTO `pickup` (`pickup_person`, `contact_no`, `schedulepickup_date
 ('Nipun Silva', '0772345678', '2025-07-19', '2025-07-19 11:00:00', '2025-07-12 09:00:00', 'SCHEDULED', 4);
 
 -- Handovers (3 records)
-INSERT IGNORE INTO `handover` (`actual_return_date`, `actual_return_time`, `return_person`, `damage_charge`, `cleaning_charge`, `late_return_fee`, `total_refund`, `damage_description`, `return_note`, `addeddatetime`, `handover_status`, `item_condition`, `rental_id`, `employee_id`) VALUES
-('2025-06-21', '15:00:00', 'Kavindi Perera', 0.00, 500.00, 0.00, 44500.00, NULL, 'Returned in good condition', '2025-06-21 15:00:00', 'RETURNED', 'GOOD', 1, 6),
-('2025-06-29', '16:00:00', 'Hashini Fernando', 0.00, 0.00, 0.00, 15000.00, NULL, 'All items returned', '2025-06-29 16:00:00', 'RETURNED', 'GOOD', 2, 6),
-('2025-07-11', '14:00:00', 'Amasha Jayawardena', 2000.00, 500.00, 0.00, 37500.00, 'Small tear on hem', 'Minor damage noted', '2025-07-11 14:00:00', 'RETURNED', 'DAMAGED', 3, 6);
+INSERT IGNORE INTO `handover` (`actual_return_date`, `actual_return_time`, `return_person`, `damage_charge`, `cleaning_charge`, `late_return_fee`, `total_refund`, `damage_description`, `return_note`, `addeddatetime`, `handover_status`, `item_condition`, `rental_id`) VALUES
+('2025-06-21', '15:00:00', 'Kavindi Perera', 0.00, 500.00, 0.00, 44500.00, NULL, 'Returned in good condition', '2025-06-21 15:00:00', 'RETURNED', 'GOOD', 1),
+('2025-06-29', '16:00:00', 'Hashini Fernando', 0.00, 0.00, 0.00, 15000.00, NULL, 'All items returned', '2025-06-29 16:00:00', 'RETURNED', 'GOOD', 2),
+('2025-07-11', '14:00:00', 'Amasha Jayawardena', 2000.00, 500.00, 0.00, 37500.00, 'Small tear on hem', 'Minor damage noted', '2025-07-11 14:00:00', 'RETURNED', 'DAMAGED', 3);
 
 -- Rental Has Item (10 records)
 INSERT IGNORE INTO `rental_has_item` (`rental_id`, `item_id`, `alteration_required`, `alteration_note`, `item_price`, `quantity`, `is_pickup`) VALUES

@@ -8,10 +8,12 @@ window.addEventListener("load", () => {
 
 
 // element refs
+const searchCustomerElement = document.querySelector("#searchCustomer");
+const hiddenCustomerElement = document.querySelector("#selectCustomer");
 const searchRentalElement = document.querySelector("#searchRental");
 const hiddenRentalElement = document.querySelector("#selectRental");
-const textCustomerElement = document.querySelector("#textCustomer");
 const textContactNumberElement = document.querySelector("#textContactNumber");
+const selectPickupStatusElement = document.querySelector("#selectPickupStatus");
 const dateScheduledPickupElement = document.querySelector("#dateScheduledPickup");
 const datetimeActualPickupElement = document.querySelector("#datetimeActualPickup");
 const textPickupPersonElement = document.querySelector("#textPickupPerson");
@@ -21,7 +23,8 @@ radioActualCustomerElement.addEventListener("change", function () {
     if (radioActualCustomerElement.checked) {
 
         textPickupPersonElement.value =
-            textCustomerElement.value;
+            searchCustomerElement.value;
+        pickup.pickup_person = textPickupPersonElement.value;
 
         textPickupPersonElement.readOnly = true;
     }
@@ -54,9 +57,6 @@ const buttonUpdate = document.getElementById("buttonUpdate");
 const buttonClear = document.getElementById("buttonClear");
 const tableBodyElement = document.querySelector("#tableBodyPickup");
 
-// Staff datalist refs
-const searchAssignedStaffElement = document.querySelector("#searchAssignedStaff");
-const hiddenAssignedStaffElement = document.querySelector("#selectAssignedStaff");
 
 // panel helpers
 function showModal() {
@@ -84,40 +84,133 @@ function refreshPickupForm() {
     buttonUpdate.style.display = "none";
     buttonSubmit.style.display = "block";
 
-    let rentals = getServiceRequest("/rental/alldata");
+    // Auto fill current date & time
+    const now = new Date();
+
+    datetimeActualPickupElement.value =
+        now.toISOString().slice(0, 16);
+
+    pickup.actualpickupdateandtime =
+        now.toISOString().slice(0, 19);
+
+    selectPickupStatusElement.value = "Scheduled";
+    pickup.pickupStatus = "Scheduled";
+
+    let customers = getServiceRequest("/customer/alldata");
+
     populateDataList(
-        document.getElementById("listRental"),
-        searchRentalElement,
-        hiddenRentalElement,
-        rentals,
-        (r) => r.rent_no,
+        document.getElementById("listCustomer"),
+        searchCustomerElement,
+        hiddenCustomerElement,
+        customers,
+        (c) => c.firstname + " " + c.lastname,
         "id"
     );
 
-    let staff = getServiceRequest("/employee/alldata");
-    populateDataList(
-        document.getElementById("listAssignedStaff"),
-        searchAssignedStaffElement,
-        hiddenAssignedStaffElement,
-        staff,
-        (s) => s.empno + " - " + s.fullname,
-        "id"
-    );
+    searchCustomerElement.addEventListener("input", () => {
 
-    // Clear form fields
+        const customer = customers.find(c =>
+            (c.firstname + " " + c.lastname) === searchCustomerElement.value
+        );
+
+        if (!customer) {
+            return;
+        }
+
+        hiddenCustomerElement.value = customer.id;
+
+        let rentals = getServiceRequest("/rental/alldata");
+
+        const rental = rentals.find(r => r.customer_id.id === customer.id);
+
+        if (!rental) {
+            showToast("No rental found for this customer.", "warning");
+            return;
+        }
+        hiddenRentalElement.value = rental.id;
+        searchRentalElement.value = rental.rent_no;
+
+        dateScheduledPickupElement.value = rental.pickup_date;
+        pickup.schedulepickup_date = rental.pickup_date;
+
+        console.log(rental);
+        refreshPickupItemsTable(rental);
+        if (radioActualCustomerElement.checked) {
+
+            textPickupPersonElement.value =
+                customer.firstname + " " + customer.lastname;
+
+            pickup.pickup_person = textPickupPersonElement.value;
+
+            // Auto load contact number
+            textContactNumberElement.value = customer.mobile;
+            pickup.contact_no = customer.mobile;
+
+            textPickupPersonElement.readOnly = true;
+        }
+
+    });
+
+    //contact number valdation
+    textContactNumberElement.addEventListener("input", function () {
+
+        // Allow only numbers
+        this.value = this.value.replace(/[^0-9]/g, "");
+
+        // Maximum 10 digits
+        if (this.value.length > 10) {
+            this.value = this.value.substring(0, 10);
+        }
+
+        pickup.contact_no = this.value;
+
+        // Validate Sri Lankan mobile number
+        if (/^(070|071|072|074|075|076|077|078)\d{7}$/.test(this.value)) {
+
+            setValid(textContactNumberElement);
+
+        } else {
+
+            setInvalid(textContactNumberElement);
+
+        }
+
+    });
+    radioActualCustomer.checked = true;
+    textPickupPersonElement.readOnly = true;
+
     clearElement([
-        textCustomerElement,
+        searchCustomerElement,
+        searchRentalElement,
         textPickupPersonElement,
         textContactNumberElement,
         dateScheduledPickupElement,
         datetimeActualPickupElement,
     ]);
     clearValidation(searchRentalElement);
-    clearValidation(searchAssignedStaffElement);
 
     setPickupFormMode('new');
 }
 
+
+radioActualCustomer.addEventListener("change", () => {
+
+    textPickupPersonElement.value = searchCustomerElement.value;
+    pickup.pickup_person = textPickupPersonElement.value;
+
+    textPickupPersonElement.readOnly = true;
+
+});
+
+radioOtherPerson.addEventListener("change", () => {
+
+    textPickupPersonElement.value = "";
+    pickup.pickup_person = "";
+
+    textPickupPersonElement.readOnly = false;
+    textPickupPersonElement.focus();
+
+});
 // define function for Refresh the pickup table
 function refreshPickupTable() {
 
@@ -139,7 +232,18 @@ function refreshPickupTable() {
         { propertyName: displayPickup_Status, dataType: "function" }
     ];
 
-    fillDataIntoTable(tableBodyElement, pickups, propertyList, refillPickupForm, pickupDelete, printPickup);
+    console.log(pickups);
+
+    fillDataIntoTable(
+        tableBodyElement,
+        pickups,
+        propertyList,
+        refillPickupForm,
+        pickupDelete,
+        printPickup
+    );
+
+    console.log("Table Filled");
 }
 
 const getCustomer = (obj) => {
@@ -164,7 +268,7 @@ function checkFormError() {
     } else {
         setValid(searchRentalElement);
     }
-    if (!textCustomerElement.value) {
+    if (!searchCustomerElement.value) {
         errors += "Customer is required..!\n";
     }
     if (!dateScheduledPickupElement.value) {
@@ -179,12 +283,6 @@ function checkFormError() {
     } else {
         setValid(textContactNumberElement);
     }
-    if (!hiddenAssignedStaffElement.value) {
-        errors += "Assigned Staff is required..!\n";
-        setInvalid(searchAssignedStaffElement);
-    } else {
-        setValid(searchAssignedStaffElement);
-    }
 
     return errors;
 }
@@ -194,11 +292,14 @@ function submitPickupForm() {
 
     pickup.rental_id = hiddenRentalElement.value ? { id: parseInt(hiddenRentalElement.value) } : null;
     pickup.pickup_person = textPickupPersonElement.value;
-    pickup.contact_number = textContactNumberElement.value;
-    pickup.scheduled_pickup_date = dateScheduledPickupElement.value;
-    pickup.actual_pickup_date = datetimeActualPickupElement.value ? datetimeActualPickupElement.value.split("T")[0] : null;
-    pickup.actual_pickup_time = datetimeActualPickupElement.value ? datetimeActualPickupElement.value.split("T")[1] : null;
-    pickup.assigned_staff = hiddenAssignedStaffElement.value ? { id: parseInt(hiddenAssignedStaffElement.value) } : null;
+    pickup.contact_no = textContactNumberElement.value;
+
+    pickup.schedulepickup_date = dateScheduledPickupElement.value;
+
+    pickup.actualpickupdateandtime =
+        datetimeActualPickupElement.value
+            ? datetimeActualPickupElement.value + ":00"
+            : null;
 
     let errors = checkFormError();
 
@@ -258,7 +359,6 @@ function printPickup(p) {
         <tr><th>Actual Time</th><td>${escapeHtml(p.actual_pickup_time || 'Pending')}</td></tr>
         <tr><th>Pickup Person</th><td>${escapeHtml(p.pickup_person || 'N/A')}</td></tr>
         <tr><th>Contact Number</th><td>${escapeHtml(p.contact_number || 'N/A')}</td></tr>
-        <tr><th>Assigned Staff</th><td>${escapeHtml(p.assigned_staff ? p.assigned_staff.callingname || p.assigned_staff : '')}</td></tr>
         <tr><th>Status</th><td>${escapeHtml(getEnumDisplayName("pickUpStatus", p.pickupStatus))}</td></tr>
         <tr><th>Outstanding Balance</th><td>Rs. ${escapeHtml(formatCurrency(p.outstanding_balance))}</td></tr>
         <tr><th>Security Deposit</th><td>Rs. ${escapeHtml(formatCurrency(p.security_deposit))}</td></tr>
@@ -286,28 +386,37 @@ const refillPickupForm = (dataObject) => {
     );
     setSelectedByHiddenId(searchRentalElement, hiddenRentalElement, rentals, (r) => r.rent_no, "id", pickup.rental_id?.id);
 
-    //re-populate staff datalist
-    let staff = getServiceRequest("/employee/alldata");
-    populateDataList(
-        document.getElementById("listAssignedStaff"),
-        searchAssignedStaffElement,
-        hiddenAssignedStaffElement,
-        staff,
-        (s) => s.empno + " - " + s.fullname,
-        "id"
-    );
-    setSelectedByHiddenId(searchAssignedStaffElement, hiddenAssignedStaffElement, staff, (s) => s.employee_id + " - " + s.fullname, "id", pickup.assigned_staff);
 
-    textCustomerElement.value = (pickup.rental_id && pickup.rental_id.customer_id)
-        ? pickup.rental_id.customer_id.firstname + " " + (pickup.rental_id.customer_id.lastname || "")
-        : "";
+    //setSelectedByHiddenId(searchAssignedStaffElement, hiddenAssignedStaffElement, staff, (s) => s.employee_id + " - " + s.fullname, "id", pickup.assigned_staff);
+
+    // Customer
+    searchCustomerElement.value =
+        pickup.rental_id.customer_id.firstname + " " +
+        pickup.rental_id.customer_id.lastname;
+
+    // Rental
+    searchRentalElement.value = pickup.rental_id.rent_no;
+    hiddenRentalElement.value = pickup.rental_id.id;
+    // ADD THIS LINE
+    refreshPickupItemsTable(pickup.rental_id);
+
+    // Pickup Person
     textPickupPersonElement.value = pickup.pickup_person;
-    textContactNumberElement.value = pickup.contact_number;
-    dateScheduledPickupElement.value = pickup.scheduled_pickup_date;
-    if (pickup.actual_pickup_date) {
-        datetimeActualPickupElement.value = pickup.actual_pickup_date + (pickup.actual_pickup_time ? "T" + pickup.actual_pickup_time : "");
+
+    // Contact Number
+    textContactNumberElement.value = pickup.contact_no;
+
+    // Scheduled Pickup Date
+    dateScheduledPickupElement.value = pickup.schedulepickup_date;
+
+    // Actual Pickup Date & Time
+    if (pickup.actualpickupdateandtime != null) {
+        datetimeActualPickupElement.value =
+            pickup.actualpickupdateandtime.substring(0, 16);
     }
 
+    // Pickup Status
+    selectPickupStatusElement.value = pickup.pickupStatus;
     buttonUpdate.style.display = "block";
     buttonSubmit.style.display = "none";
 
@@ -346,9 +455,6 @@ const checkFormUpdates = () => {
     if (pickup.contact_number != oldPickup.contact_number) {
         updates += "Contact Number changed from " + oldPickup.contact_number + " to " + pickup.contact_number + "\n";
     }
-    if (pickup.assigned_staff != oldPickup.assigned_staff) {
-        updates += "Assigned Staff changed from " + oldPickup.assigned_staff + " to " + pickup.assigned_staff + "\n";
-    }
     if (pickup.pickup_location != oldPickup.pickup_location) {
         updates += "Pickup Location changed from " + oldPickup.pickup_location + " to " + pickup.pickup_location + "\n";
     }
@@ -379,7 +485,6 @@ const updatePickupForm = () => {
     pickup.scheduled_pickup_date = dateScheduledPickupElement.value;
     pickup.actual_pickup_date = datetimeActualPickupElement.value ? datetimeActualPickupElement.value.split("T")[0] : null;
     pickup.actual_pickup_time = datetimeActualPickupElement.value ? datetimeActualPickupElement.value.split("T")[1] : null;
-    pickup.assigned_staff = hiddenAssignedStaffElement.value ? { id: parseInt(hiddenAssignedStaffElement.value) } : null;
 
     let errors = checkFormError();
     if (errors == "") {
@@ -421,7 +526,7 @@ function loadRentalDetails() {
             match.customer_id.firstname + " " +
             match.customer_id.lastname;
 
-        textCustomerElement.value = customerName;
+        searchCustomerElement.value = customerName;
 
         textContactNumberElement.value =
             match.customer_id.mobile;

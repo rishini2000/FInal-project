@@ -43,24 +43,42 @@
                     <div class="offcanvas-body">
                         <form id="formHandOver" onsubmit="return false;">
                             <!-- Section: Return Details -->
-                            <h6 class="form-section-title"><i class="fa-solid fa-rotate-left me-2"></i>Return Details</h6>
+                            <h6 class="form-section-title"><i class="fa-solid fa-rotate-left me-2"></i>Return Details
+                            </h6>
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label for="searchRental" class="form-label fw-bold">Rental Code <span class="text-danger">*</span></label>
+                                    <label for="searchCustomer" class="form-label fw-bold">
+                                        Customer <span class="text-danger">*</span>
+                                    </label>
                                     <div class="input-group">
-                                        <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
-                                        <input type="text" id="searchRental" class="form-control" placeholder="Search rental..." list="listRental">
+                                        <span class="input-group-text">
+                                            <i class="fa-solid fa-user"></i>
+                                        </span>
+                                        <input type="text" id="searchCustomer" list="listCustomer">
+                                        <datalist id="listCustomer"></datalist>
+                                        <input type="hidden" id="selectCustomer">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="searchRental" class="form-label fw-bold">Rental Code <span
+                                            class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i
+                                                class="fa-solid fa-magnifying-glass"></i></span>
+                                        <input type="text" id="searchRental" class="form-control"
+                                            placeholder="Search rental..." list="listRental">
                                         <datalist id="listRental"></datalist>
                                         <input type="hidden" id="selectRental">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="searchAssignedStaff" class="form-label fw-bold">Assigned Staff <span class="text-danger">*</span></label>
+                                    <label class="form-label fw-bold">Scheduled Return Date</label>
                                     <div class="input-group">
-                                        <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
-                                        <input type="text" id="searchAssignedStaff" class="form-control" placeholder="Search staff..." list="listAssignedStaff">
-                                        <datalist id="listAssignedStaff"></datalist>
-                                        <input type="hidden" id="selectAssignedStaff">
+                                        <span class="input-group-text">
+                                            <i class="fa-solid fa-calendar-check"></i>
+                                        </span>
+                                        <input type="date" id="dateScheduledReturn" class="form-control" readonly>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -70,25 +88,62 @@
                                         <input type="date" id="dateActualReturn" class="form-control input-element">
                                     </div>
                                 </div>
+
                                 <div class="col-md-6">
                                     <label for="timeActualReturn" class="form-label fw-bold">Actual Return Time</label>
                                     <input type="time" id="timeActualReturn" class="form-control input-element">
                                 </div>
+
                                 <div class="col-md-6">
-                                    <label for="textReturnPerson" class="form-label fw-bold">Return Person</label>
-                                    <input type="text" id="textReturnPerson" placeholder="Name of person returning" class="form-control input-element">
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="selectItemCondition" class="form-label fw-bold">Item Condition <span class="text-danger">*</span></label>
+                                    <label for="selectItemCondition" class="form-label fw-bold">Item Condition <span
+                                            class="text-danger">*</span></label>
                                     <select id="selectItemCondition" class="form-select input-element" required>
                                         <option value="" selected disabled>-- Select Condition --</option>
                                     </select>
                                 </div>
+
                                 <div class="col-md-6">
-                                    <label for="selectStatus" class="form-label fw-bold">Status <span class="text-danger">*</span></label>
+                                    <label for="selectStatus" class="form-label fw-bold">Status <span
+                                            class="text-danger">*</span></label>
                                     <select id="selectStatus" class="form-select input-element" required>
                                         <option value="" selected disabled>-- Select Status --</option>
                                     </select>
+                                </div>
+
+                            </div>
+
+                            <!-- Section: Return Person -->
+                            <hr class="form-section-divider">
+                            <h6 class="form-section-title"><i class="fa-solid fa-user me-2"></i>Return Person</h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Return By</label>
+                                    <div class="btn-group w-100" role="group">
+                                        <input type="radio" class="btn-check" name="returnPersonType"
+                                            id="radioActualCustomer" checked>
+                                        <label class="btn btn-outline-primary" for="radioActualCustomer"><i
+                                                class="fa-solid fa-user me-1"></i>Actual Customer</label>
+                                        <input type="radio" class="btn-check" name="returnPersonType"
+                                            id="radioOtherPerson">
+                                        <label class="btn btn-outline-primary" for="radioOtherPerson"><i
+                                                class="fa-solid fa-user-plus me-1"></i>Other Person</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="textReturnPerson" class="form-label fw-bold">Return Person</label>
+                                    <input type="text" id="textReturnPerson" class="form-control input-element">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="textContactNumber" class="form-label fw-bold">
+                                        Contact Number
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
+                                        <input type="text" id="textContactNumber" class="form-control" maxlength="10"
+                                            autocomplete="off">
+                                    </div>
                                 </div>
                             </div>
 
@@ -97,57 +152,63 @@
                             <h6 class="form-section-title"><i class="fa-solid fa-coins me-2"></i>Charges & Refund</h6>
                             <div class="row g-3">
                                 <div class="col-md-4">
-                                    <label for="textSecurityDeposit" class="form-label fw-bold">Security Deposit <span class="text-danger">*</span></label>
+                                    <label for="textSecurityDeposit" class="form-label fw-bold">Key Money <span
+                                            class="text-danger">*</span></label>
                                     <div class="input-group">
                                         <span class="input-group-text currency">Rs.</span>
-                                        <input type="number" id="textSecurityDeposit" required placeholder="0.00" class="form-control input-element" step="0.01" min="0">
+                                        <input type="number" id="textSecurityDeposit" class="form-control" readonly>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <label for="textDamageCharges" class="form-label fw-bold">Damage Charges</label>
                                     <div class="input-group">
                                         <span class="input-group-text currency">Rs.</span>
-                                        <input type="number" id="textDamageCharges" placeholder="0.00" class="form-control input-element" step="0.01" min="0">
+                                        <input type="number" id="textDamageCharges" placeholder="0.00"
+                                            class="form-control input-element" step="0.01" min="0">
                                     </div>
                                 </div>
                                 <div class="col-md-4">
-                                    <label for="textLateReturnFee" class="form-label fw-bold">Late Return Fee</label>
+                                    <label for="textLateReturnFee" class="form-label fw-bold">Late Return
+                                        Fee</label>
                                     <div class="input-group">
                                         <span class="input-group-text currency">Rs.</span>
-                                        <input type="number" id="textLateReturnFee" placeholder="0.00" class="form-control input-element" step="0.01" min="0">
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <label for="textCleaningCharges" class="form-label fw-bold">Cleaning Charges</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text currency">Rs.</span>
-                                        <input type="number" id="textCleaningCharges" placeholder="0.00" class="form-control input-element" step="0.01" min="0">
+                                        <input type="number" id="textLateReturnFee" class="form-control" readonly>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <label for="textTotalRefund" class="form-label fw-bold">Total Refund</label>
                                     <div class="input-group">
                                         <span class="input-group-text currency">Rs.</span>
-                                        <input type="number" id="textTotalRefund" placeholder="0.00" class="form-control input-element readonly-calculated" step="0.01" min="0" readonly>
+                                        <input type="number" id="textTotalRefund" placeholder="0.00"
+                                            class="form-control input-element readonly-calculated" step="0.01" min="0"
+                                            readonly>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <label for="textReceiptNumber" class="form-label fw-bold">Receipt Number</label>
-                                    <input type="text" id="textReceiptNumber" placeholder="Enter Receipt Number" class="form-control input-element">
+                                    <input type="text" id="textReceiptNumber" placeholder="Enter Receipt Number"
+                                        class="form-control input-element">
                                 </div>
                             </div>
 
                             <!-- Section: Damage & Notes -->
                             <hr class="form-section-divider">
-                            <h6 class="form-section-title"><i class="fa-solid fa-sticky-note me-2"></i>Damage & Notes</h6>
+                            <h6 class="form-section-title"><i class="fa-solid fa-sticky-note me-2"></i>Damage &
+                                Notes
+                            </h6>
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label for="textDamageDescription" class="form-label fw-bold">Damage Description</label>
-                                    <textarea id="textDamageDescription" placeholder="Describe any damages, stains, tears, missing parts..." class="form-control input-element" rows="3"></textarea>
+                                    <label for="textDamageDescription" class="form-label fw-bold">Damage
+                                        Description</label>
+                                    <textarea id="textDamageDescription"
+                                        placeholder="Describe any damages, stains, tears, missing parts..."
+                                        class="form-control input-element" rows="3"></textarea>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="textReturnNotes" class="form-label fw-bold">Return Notes</label>
-                                    <textarea id="textReturnNotes" placeholder="General return observations, customer requests, special notes..." class="form-control input-element" rows="3"></textarea>
+                                    <textarea id="textReturnNotes"
+                                        placeholder="General return observations, customer requests, special notes..."
+                                        class="form-control input-element" rows="3"></textarea>
                                 </div>
                             </div>
 
@@ -177,9 +238,13 @@
                             <button type="button" id="buttonClear" class="btn-clear"
                                 onclick="document.getElementById('formHandOver')?.reset()">Clear</button>
                             <button type="button" id="buttonUpdate" class="btn-update" style="display:none;"
-                                onclick="buttonReturnUpdate();">Update</button>
-                            <button type="button" id="buttonSubmit" class="btn-submit"
-                                onclick="buttonReturnSubmit();">Submit</button>
+                                onclick="updateHandOverForm();">
+                                Update
+                            </button>
+
+                            <button type="button" id="buttonSubmit" class="btn-submit" onclick="submitHandOverForm();">
+                                Submit
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -193,14 +258,14 @@
                                     <thead>
                                         <tr>
                                             <th>No</th>
-                                            <th>Rental</th>
-                                            <th>Assigned Staff</th>
+                                            <th>Customer</th>
+                                            <th>Rental No</th>
+                                            <th>Return Person</th>
                                             <th>Actual Return Date</th>
                                             <th>Actual Return Time</th>
                                             <th>Status</th>
                                             <th>Item Condition</th>
                                             <th>Damage Charge</th>
-                                            <th>Cleaning Charge</th>
                                             <th>Late Return Fee</th>
                                             <th>Total Refund</th>
                                             <th>Action</th>

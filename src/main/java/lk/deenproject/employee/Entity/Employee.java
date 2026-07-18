@@ -41,20 +41,25 @@ public class Employee {
     private Integer id;
 
     private String empno;
-    @NotBlank @Size(min = 2, max = 100)
+    @NotBlank
+    @Size(min = 2, max = 100)
     private String fullname;
-    @NotBlank @Size(max = 50)
+    @NotBlank
+    @Size(max = 50)
     private String callingname;
-    @NotBlank @Size(max = 12)
+    @NotBlank
+    @Size(max = 12)
     private String nic;
-    @NotBlank @Pattern(regexp = "^\\d{9,10}$")
+    @NotBlank
+    @Pattern(regexp = "^\\d{9,10}$")
     private String mobile;
 
     @NotNull
     private LocalDate dob;
 
     private String address;
-    @NotBlank @Email
+    @NotBlank
+    @Email
     private String email;
 
     private LocalDateTime addeddatetime;
@@ -82,6 +87,22 @@ public class Employee {
     public Employee(Integer id, String fullname, String nic, String email, String mobileno,
             Designation designation, EmployeeStatus employeeStatus, LocalDate dob) {
         this.id = id;
+        this.fullname = fullname;
+        this.nic = nic;
+        this.email = email;
+        this.mobile = mobileno;
+        this.designation = designation;
+        this.employeeStatus = employeeStatus;
+        this.dob = dob;
+    }
+
+    public Employee(Integer id, String empno, String fullname,
+            String nic, String email, String mobileno,
+            Designation designation, EmployeeStatus employeeStatus,
+            LocalDate dob) {
+
+        this.id = id;
+        this.empno = empno;
         this.fullname = fullname;
         this.nic = nic;
         this.email = email;

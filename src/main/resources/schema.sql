@@ -357,7 +357,7 @@ CREATE TABLE `pickup` (
   `pickup_person` varchar(45) DEFAULT NULL,
   `contact_no` varchar(45) DEFAULT NULL,
   `schedulepickup_date` date DEFAULT NULL,
-  `actualpickupdateandtime` datetime NOT NULL,
+  `actualpickupdateandtime` datetime NULL,
   `addeddatetime` datetime DEFAULT NULL,
   `deletedatetime` datetime DEFAULT NULL,
   `updatedatetime` datetime DEFAULT NULL,
@@ -367,9 +367,11 @@ CREATE TABLE `pickup` (
   `pickup_status` varchar(50) NOT NULL,
   `rental_id` int NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `id_UNIQUE` (`id`),
-  KEY `fk_pickup_rental1_idx` (`rental_id`),
-  CONSTRAINT `fk_pickup_rental1` FOREIGN KEY (`rental_id`) REFERENCES `rental` (`id`)
+UNIQUE KEY `id_UNIQUE` (`id`),
+KEY `fk_pickup_rental1_idx` (`rental_id`),
+CONSTRAINT `fk_pickup_rental1`
+FOREIGN KEY (`rental_id`)
+REFERENCES `rental` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 CREATE TABLE `fitton` (
@@ -417,14 +419,11 @@ CREATE TABLE `handover` (
   `handover_status` varchar(50) NOT NULL,
   `item_condition` varchar(50) NOT NULL,
   `rental_id` int NOT NULL,
-  `employee_id` int NOT NULL,
   `addeddatetime` datetime NOT NULL,
   `updatedatetime` datetime DEFAULT NULL,
   `deletedatetime` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_handover_rental1_idx` (`rental_id`),
-  KEY `fk_handover_employee1_idx` (`employee_id`),
-  CONSTRAINT `fk_handover_employee1` FOREIGN KEY (`employee_id`) REFERENCES `employee` (`id`),
   CONSTRAINT `fk_handover_rental1` FOREIGN KEY (`rental_id`) REFERENCES `rental` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 

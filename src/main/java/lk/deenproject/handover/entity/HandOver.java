@@ -15,7 +15,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lk.deenproject.employee.Entity.Employee;
 import lk.deenproject.enums.HandOverStatus;
 import lk.deenproject.enums.ItemCondition;
 import lk.deenproject.rental.entity.Rental;
@@ -65,7 +64,4 @@ public class HandOver {
     @JoinColumn(name = "rental_id", referencedColumnName = "id")
     private Rental rental_id;
 
-    @ManyToOne
-    @JoinColumn(name = "employee_id", referencedColumnName = "id")
-    private Employee employee_id;
 }

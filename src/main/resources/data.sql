@@ -191,11 +191,11 @@ INSERT IGNORE INTO `appointment` (`appointment_no`, `date`, `start_time`, `end_t
 -- Rentals (6 records)
 INSERT IGNORE INTO `rental` (`rent_no`, `appointment_date`, `function_date`, `fitton_date`, `pickup_date`, `return_date`, `keymoney`, `total_charge`, `advance`, `note`, `addeddatetime`, `rental_status`, `customer_id`) VALUES
 ('RNT001', '2025-06-15', '2025-06-20', '2025-06-18', '2025-06-19', '2025-06-21', 50000.00, 15000.00, 10000.00, 'Wedding dress rental', '2025-06-15 10:00:00', 'COMPLETED', 1),
-('RNT002', '2025-06-22', '2025-06-28', '2025-06-26', '2025-06-27', '2025-06-29', 15000.00, 5000.00, 3000.00, 'Tiara and jewelry set', '2025-06-22 11:00:00', 'COMPLETED', 3),
-('RNT003', '2025-07-02', '2025-07-10', '2025-07-08', '2025-07-09', '2025-07-11', 40000.00, 12000.00, 8000.00, 'Vintage lace dress rental', '2025-07-02 15:00:00', 'COMPLETED', 5),
-('RNT004', '2025-07-12', '2025-07-20', '2025-07-18', '2025-07-19', '2025-07-21', 8000.00, 3000.00, 2000.00, 'Bridal shoes rental', '2025-07-12 09:00:00', 'ACTIVE', 2),
-('RNT005', '2025-07-14', '2025-07-25', '2025-07-23', '2025-07-24', '2025-07-26', 20000.00, 7000.00, 5000.00, 'Pearl necklace set', '2025-07-14 10:00:00', 'ACTIVE', 4),
-('RNT006', '2025-07-15', '2025-08-01', '2025-07-30', '2025-07-31', '2025-08-02', 5000.00, 2000.00, 1500.00, 'Flower crown rental', '2025-07-15 14:00:00', 'ACTIVE', 7);
+('RNT002', '2025-06-22', '2025-06-28', '2025-06-26', '2025-06-27', '2025-06-29', 15000.00, 5000.00, 3000.00, 'Tiara and jewelry set', '2025-06-22 11:00:00', 'COMPLETED', 2),
+('RNT003', '2025-07-02', '2025-07-10', '2025-07-08', '2025-07-09', '2025-07-11', 40000.00, 12000.00, 8000.00, 'Vintage lace dress rental', '2025-07-02 15:00:00', 'COMPLETED', 3),
+('RNT004', '2025-07-12', '2025-07-20', '2025-07-18', '2025-07-19', '2025-07-21', 8000.00, 3000.00, 2000.00, 'Bridal shoes rental', '2025-07-12 09:00:00', 'ACTIVE', 4),
+('RNT005', '2025-07-14', '2025-07-25', '2025-07-23', '2025-07-24', '2025-07-26', 20000.00, 7000.00, 5000.00, 'Pearl necklace set', '2025-07-14 10:00:00', 'ACTIVE', 5),
+('RNT006', '2025-07-15', '2025-08-01', '2025-07-30', '2025-07-31', '2025-08-02', 5000.00, 2000.00, 1500.00, 'Flower crown rental', '2025-07-15 14:00:00', 'ACTIVE', 6);
 
 -- ============================================================
 -- TIER 3: Transactions
@@ -238,10 +238,10 @@ INSERT IGNORE INTO `pickup` (`pickup_person`, `contact_no`, `schedulepickup_date
 ('Nipun Silva', '0772345678', '2025-07-19', '2025-07-19 11:00:00', '2025-07-12 09:00:00', 'SCHEDULED', 4);
 
 -- Handovers (3 records)
-INSERT IGNORE INTO `handover` (`actual_return_date`, `actual_return_time`, `return_person`, `damage_charge`, `cleaning_charge`, `late_return_fee`, `total_refund`, `damage_description`, `return_note`, `addeddatetime`, `handover_status`, `item_condition`, `rental_id`, `employee_id`) VALUES
-('2025-06-21', '15:00:00', 'Kavindi Perera', 0.00, 500.00, 0.00, 44500.00, NULL, 'Returned in good condition', '2025-06-21 15:00:00', 'RETURNED', 'GOOD', 1, 6),
-('2025-06-29', '16:00:00', 'Hashini Fernando', 0.00, 0.00, 0.00, 15000.00, NULL, 'All items returned', '2025-06-29 16:00:00', 'RETURNED', 'GOOD', 2, 6),
-('2025-07-11', '14:00:00', 'Amasha Jayawardena', 2000.00, 500.00, 0.00, 37500.00, 'Small tear on hem', 'Minor damage noted', '2025-07-11 14:00:00', 'RETURNED', 'DAMAGED', 3, 6);
+INSERT IGNORE INTO `handover` (`actual_return_date`, `actual_return_time`, `return_person`, `damage_charge`, `cleaning_charge`, `late_return_fee`, `total_refund`, `damage_description`, `return_note`, `addeddatetime`, `handover_status`, `item_condition`, `rental_id`) VALUES
+('2025-06-21', '15:00:00', 'Kavindi Perera', 0.00, 500.00, 0.00, 44500.00, NULL, 'Returned in good condition', '2025-06-21 15:00:00', 'RETURNED', 'GOOD', 1),
+('2025-06-29', '16:00:00', 'Hashini Fernando', 0.00, 0.00, 0.00, 15000.00, NULL, 'All items returned', '2025-06-29 16:00:00', 'RETURNED', 'GOOD', 2),
+('2025-07-11', '14:00:00', 'Amasha Jayawardena', 2000.00, 500.00, 0.00, 37500.00, 'Small tear on hem', 'Minor damage noted', '2025-07-11 14:00:00', 'RETURNED', 'DAMAGED', 3);
 
 -- Rental Has Item (10 records)
 INSERT IGNORE INTO `rental_has_item` (`rental_id`, `item_id`, `alteration_required`, `alteration_note`, `item_price`, `quantity`, `is_pickup`) VALUES

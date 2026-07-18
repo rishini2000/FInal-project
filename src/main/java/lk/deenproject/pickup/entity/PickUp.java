@@ -35,7 +35,7 @@ public class PickUp {
     private String contact_no;
     private LocalDate schedulepickup_date;
     private LocalDateTime actualpickupdateandtime;
-
+    
     private LocalDateTime addeddatetime;
     private LocalDateTime deletedatetime;
     private LocalDateTime updatedatetime;

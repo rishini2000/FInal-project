@@ -4,19 +4,24 @@ window.addEventListener("load", () => {
 });
 
 // element refs
+const searchCustomerElement = document.querySelector("#searchCustomer");
+const selectCustomerElement = document.querySelector("#selectCustomer");
 const searchRentalElement = document.querySelector("#searchRental");
 const selectRentalElement = document.querySelector("#selectRental");
-const searchAssignedStaffElement = document.querySelector("#searchAssignedStaff");
-const selectAssignedStaffElement = document.querySelector("#selectAssignedStaff");
+const radioActualCustomerElement = document.querySelector("#radioActualCustomer");
+const radioOtherPersonElement = document.querySelector("#radioOtherPerson");
+
+const textReturnPersonElement = document.querySelector("#textReturnPerson");
+const textContactNumberElement = document.querySelector("#textContactNumber");
+const dateScheduledReturnElement = document.querySelector("#dateScheduledReturn");
 const dateActualReturnElement = document.querySelector("#dateActualReturn");
 const timeActualReturnElement = document.querySelector("#timeActualReturn");
-const textReturnPersonElement = document.querySelector("#textReturnPerson");
+
 const selectItemConditionElement = document.querySelector("#selectItemCondition");
 const selectStatusElement = document.querySelector("#selectStatus");
 const textSecurityDepositElement = document.querySelector("#textSecurityDeposit");
 const textDamageChargesElement = document.querySelector("#textDamageCharges");
 const textLateReturnFeeElement = document.querySelector("#textLateReturnFee");
-const textCleaningChargesElement = document.querySelector("#textCleaningCharges");
 const textTotalRefundElement = document.querySelector("#textTotalRefund");
 const textReceiptNumberElement = document.querySelector("#textReceiptNumber");
 const textDamageDescriptionElement = document.querySelector("#textDamageDescription");
@@ -29,6 +34,9 @@ const buttonSubmit = document.getElementById("buttonSubmit");
 const buttonUpdate = document.getElementById("buttonUpdate");
 const buttonClear = document.getElementById("buttonClear");
 const tableBodyElement = document.querySelector("#tableBodyReturn");
+
+let customers = [];
+let rentals = [];
 
 // panel helpers
 function showModal() {
@@ -46,54 +54,186 @@ function refreshHandOverForm() {
     handover = new Object();
     handover.handoverHasItemList = new Array();
 
+    // Auto load current date
+    const today = new Date();
+
+    dateActualReturnElement.value = today.toISOString().split("T")[0];
+    handover.actual_return_date = dateActualReturnElement.value;
+
+    // Auto load current time
+    timeActualReturnElement.value = today.toTimeString().slice(0, 5);
+    handover.actual_return_time = timeActualReturnElement.value;
+
     buttonUpdate.style.display = "none";
     buttonSubmit.style.display = "block";
 
+    customers = getServiceRequest("/customer/alldata");
+
+    populateDataList(
+        document.getElementById("listCustomer"),
+        searchCustomerElement,
+        selectCustomerElement,
+        customers,
+        (c) => c.firstname + " " + c.lastname,
+        "id"
+    );
+
     // Populate rental datalist
-    let rentals = getServiceRequest("/rental/alldata");
+    rentals = getServiceRequest("/rental/alldata");
     populateDataList(document.getElementById("listRental"), searchRentalElement, selectRentalElement, rentals, (r) => r.rent_no, "id");
-
-    // Populate staff datalist
-    let employees = getServiceRequest("/employee/alldata");
-    populateDataList(document.getElementById("listAssignedStaff"), searchAssignedStaffElement, selectAssignedStaffElement, employees, (e) => e.callingname, "id");
-
     //handover status and item condition options (enum-based)
     fillSelectFromEnum(selectStatusElement, "handoverStatus", "Please select status...!");
-    fillSelectFromEnum(selectItemConditionElement, "itemCondition", "Please select condition...!");
+    selectStatusElement.value = "Pending";
+    handover.handoverStatus = "Pending";
 
-    clearElement([searchRentalElement, selectRentalElement, dateActualReturnElement, timeActualReturnElement, textReturnPersonElement, searchAssignedStaffElement, selectAssignedStaffElement, selectItemConditionElement, selectStatusElement, textSecurityDepositElement, textDamageChargesElement, textLateReturnFeeElement, textCleaningChargesElement, textTotalRefundElement, textReceiptNumberElement, textDamageDescriptionElement, textReturnNotesElement]);
+    fillSelectFromEnum(selectItemConditionElement, "itemCondition", "Please select condition...!");
+    selectItemConditionElement.value = "Good";
+    handover.itemCondition = "Good";
+
+    clearElement([searchRentalElement, selectRentalElement, dateActualReturnElement, timeActualReturnElement, textReturnPersonElement, selectItemConditionElement, selectStatusElement, textSecurityDepositElement, textDamageChargesElement, textLateReturnFeeElement, textTotalRefundElement, textReceiptNumberElement, textDamageDescriptionElement, textReturnNotesElement]);
 
     document.querySelector('#panelHandoverForm .offcanvas-title').textContent = 'New Handover';
 
-    // Listen for rental selection to load items
-    searchRentalElement.addEventListener("input", () => {
-        const hiddenValue = selectRentalElement.value;
-        if (hiddenValue) {
-            loadRentalItems();
-        }
-    });
-
 }
+
+searchCustomerElement.addEventListener("input", () => {
+    const customer = customers.find(c =>
+        (c.firstname + " " + c.lastname) === searchCustomerElement.value
+    );
+
+    if (!customer) return;
+
+    const rental = rentals.find(r => r.customer_id.id === customer.id);
+
+    if (!rental) return;
+
+    selectRentalElement.value = rental.id;
+    searchRentalElement.value = rental.rent_no;
+
+    handover.rental_id = rental;
+
+    dateScheduledReturnElement.value = rental.return_date;
+
+    textSecurityDepositElement.value = rental.keymoney;
+
+    calculateLateReturnFee();
+
+    // Auto fill customer details
+    textReturnPersonElement.value =
+        customer.firstname + " " + customer.lastname;
+
+    textContactNumberElement.value = customer.mobile;
+
+    setValid(textReturnPersonElement);
+    setValid(textContactNumberElement);
+
+    handover.return_person = textReturnPersonElement.value;
+
+    textReturnPersonElement.readOnly = true;
+    textContactNumberElement.readOnly = true;
+
+    loadRentalItems();
+
+});
+
+radioActualCustomerElement.addEventListener("change", () => {
+
+    if (radioActualCustomerElement.checked) {
+
+        const customer = customers.find(c =>
+            c.id == selectCustomerElement.value
+        );
+
+        if (customer) {
+
+            textReturnPersonElement.value =
+                customer.firstname + " " + customer.lastname;
+
+            textContactNumberElement.value =
+                customer.mobile;
+
+            setValid(textReturnPersonElement);
+            setValid(textContactNumberElement);
+
+            handover.return_person =
+                textReturnPersonElement.value;
+        }
+
+        textReturnPersonElement.readOnly = true;
+        textContactNumberElement.readOnly = true;
+    }
+
+});
+
+radioOtherPersonElement.addEventListener("change", () => {
+
+    if (radioOtherPersonElement.checked) {
+
+        textReturnPersonElement.value = "";
+        textContactNumberElement.value = "";
+
+        handover.return_person = "";
+
+        textReturnPersonElement.readOnly = false;
+        textContactNumberElement.readOnly = false;
+
+        textReturnPersonElement.focus();
+    }
+
+});
+
+dateActualReturnElement.addEventListener("change", () => {
+
+    handover.actual_return_date = dateActualReturnElement.value;
+
+    calculateLateReturnFee();
+
+});
+textDamageChargesElement.addEventListener("keyup", () => {
+
+    let damage = parseFloat(textDamageChargesElement.value) || 0;
+
+    handover.damage_charge = damage;
+
+    calculateTotalRefund();
+
+});
+
 
 // define function for refresh table
 function refreshHandOverTable() {
     handovers = getServiceRequest("/handover/alldata");
 
+    console.log(handovers);
+
     if (!Array.isArray(handovers)) {
         handovers = Object.values(handovers || {});
     }
+
     const propertyList = [
+
+        { propertyName: getCustomer, dataType: "function" },
+
         { propertyName: getRental, dataType: "function" },
-        { propertyName: getAssignedStaff, dataType: "function" },
+
+        { propertyName: "return_person", dataType: "string" },
+
         { propertyName: "actual_return_date", dataType: "date" },
+
         { propertyName: "actual_return_time", dataType: "string" },
+
         { propertyName: getHandoverStatus, dataType: "function" },
+
         { propertyName: getItemCondition, dataType: "function" },
+
         { propertyName: "damage_charge", dataType: "currency" },
-        { propertyName: "cleaning_charge", dataType: "currency" },
+
         { propertyName: "late_return_fee", dataType: "currency" },
-        { propertyName: "total_refund", dataType: "currency" },
+
+        { propertyName: "total_refund", dataType: "currency" }
+
     ];
+
     fillDataIntoTable(tableBodyElement, handovers, propertyList, refillHandOverForm, deleteHandOver, printHandOver);
 }
 
@@ -103,14 +243,18 @@ function getRental(rowObject) {
     }
     return "";
 }
+function getCustomer(rowObject) {
 
-function getAssignedStaff(rowObject) {
-    if (rowObject.employee_id) {
-        return rowObject.employee_id.callingname;
+    if (rowObject.rental_id && rowObject.rental_id.customer_id) {
+
+        return rowObject.rental_id.customer_id.firstname + " " +
+            rowObject.rental_id.customer_id.lastname;
+
     }
-    return "";
-}
 
+    return "";
+
+}
 function getHandoverStatus(rowObject) {
     return getEnumDisplayName("handoverStatus", rowObject.handoverStatus);
 }
@@ -118,6 +262,45 @@ function getHandoverStatus(rowObject) {
 function getItemCondition(rowObject) {
     return getEnumDisplayName("itemCondition", rowObject.itemCondition);
 }
+
+//validation //
+textReturnPersonElement.addEventListener("keyup", () => {
+
+    let returnPerson = textReturnPersonElement.value.trim();
+
+    let regPattern = /^[A-Za-z ]{3,50}$/;
+
+    if (regPattern.test(returnPerson)) {
+
+        setValid(textReturnPersonElement);
+        handover.return_person = returnPerson;
+
+    } else {
+
+        setInvalid(textReturnPersonElement);
+        handover.return_person = null;
+
+    }
+
+});
+
+textContactNumberElement.addEventListener("keyup", () => {
+
+    let contact = textContactNumberElement.value.trim();
+
+    let regPattern = /^07[01245678][0-9]{7}$/;
+
+    if (regPattern.test(contact)) {
+
+        setValid(textContactNumberElement);
+
+    } else {
+
+        setInvalid(textContactNumberElement);
+
+    }
+
+});
 
 // print
 function printHandOver(r) {
@@ -135,13 +318,11 @@ function printHandOver(r) {
         <tr><th>Actual Date</th><td>${escapeHtml(r.actual_return_date ? formatDate(r.actual_return_date) : 'Pending')}</td></tr>
         <tr><th>Actual Time</th><td>${escapeHtml(r.actual_return_time || 'Pending')}</td></tr>
         <tr><th>Return Person</th><td>${escapeHtml(r.return_person || 'N/A')}</td></tr>
-        <tr><th>Assigned Staff</th><td>${escapeHtml(r.assigned_staff)}</td></tr>
         <tr><th>Item Condition</th><td>${escapeHtml(capitalize(r.item_condition))}</td></tr>
         <tr><th>Status</th><td>${escapeHtml(capitalize(r.status))}</td></tr>
         <tr><th>Security Deposit</th><td>Rs. ${escapeHtml(formatCurrency(r.security_deposit))}</td></tr>
         <tr><th>Damage Charges</th><td>Rs. ${escapeHtml(formatCurrency(r.damage_charges))}</td></tr>
         <tr><th>Late Return Fee</th><td>Rs. ${escapeHtml(formatCurrency(r.late_return_fee))}</td></tr>
-        <tr><th>Cleaning Charges</th><td>Rs. ${escapeHtml(formatCurrency(r.cleaning_charges))}</td></tr>
         <tr><th>Total Refund</th><td>Rs. ${escapeHtml(formatCurrency(r.total_refund))}</td></tr>
         <tr><th>Receipt Number</th><td>${escapeHtml(r.receipt_number || 'N/A')}</td></tr>
         <tr><th>Damage Description</th><td>${escapeHtml(r.damage_description || 'None')}</td></tr>
@@ -171,42 +352,52 @@ function loadRentalItems() {
     <input type="checkbox" checked class="form-check-input">
 </td>
 <td>
-    <select class="form-select">
-        <option>Excellent</option>
-        <option>Good</option>
-        <option>Fair</option>
-        <option>Damaged</option>
-        <option>Missing</option>
-    </select>
+<select class="form-select">
+    <option>Good</option>
+    <option>Damaged</option>
+    <option>Lost</option>
+</select>
 </td>
 `;
+            const conditionSelect = row.querySelector("select");
+
+            conditionSelect.addEventListener("change", () => {
+
+                updateOverallItemCondition();
+
+            });
+
             tableBodyHandoverItemsElement.appendChild(row);
+
         });
     }
 }
 
-// Refresh form - reset all fields and re-populate dropdowns
-const refreshHandOverForm2 = () => {
-    handover = {};
-    oldHandover = null;
-    formHandOver.reset();
+function updateOverallItemCondition() {
 
-    // Re-populate rental datalist
-    let rentals = getServiceRequest("/rental/alldata");
-    populateDataList(document.getElementById("listRental"), searchRentalElement, selectRentalElement, rentals, (r) => r.rent_no, "id");
+    let overall = "Good";
 
-    // Re-populate staff datalist
-    let employees = getServiceRequest("/employee/alldata");
-    populateDataList(document.getElementById("listAssignedStaff"), searchAssignedStaffElement, selectAssignedStaffElement, employees, (e) => e.callingname, "id");
+    const allConditions = tableBodyHandoverItemsElement.querySelectorAll("select");
 
-    // Re-populate enum selects
-    fillSelectFromEnum(selectStatusElement, "handoverStatus", "Please select status...!");
-    fillSelectFromEnum(selectItemConditionElement, "itemCondition", "Please select condition...!");
+    allConditions.forEach(select => {
 
-    buttonUpdate.style.display = "none";
-    buttonSubmit.style.display = "block";
-    document.querySelector('#panelHandoverForm .offcanvas-title').textContent = 'New Handover';
-};
+        let value = select.value;
+
+        if (value === "Lost") {
+
+            overall = "Lost";
+
+        } else if (value === "Damaged" && overall !== "Lost") {
+
+            overall = "Damaged";
+
+        }
+
+    });
+
+    selectItemConditionElement.value = overall;
+    handover.itemCondition = overall;
+}
 
 // Form refill for edit
 const refillHandOverForm = (obj) => {
@@ -215,13 +406,44 @@ const refillHandOverForm = (obj) => {
 
     // Re-populate rental datalist and set value
     let rentals = getServiceRequest("/rental/alldata");
-    populateDataList(document.getElementById("listRental"), searchRentalElement, selectRentalElement, rentals, (r) => r.rent_no, "id");
-    setSelectedByHiddenId(searchRentalElement, selectRentalElement, rentals, (r) => r.rent_no, "id", handover.rental_id?.id);
+    populateDataList(document.getElementById("listRental"),
+        searchRentalElement,
+        selectRentalElement,
+        rentals,
+        (r) => r.rent_no,
+        "id"
+    );
 
-    // Re-populate staff datalist and set value
-    let employees = getServiceRequest("/employee/alldata");
-    populateDataList(document.getElementById("listAssignedStaff"), searchAssignedStaffElement, selectAssignedStaffElement, employees, (e) => e.callingname, "id");
-    setSelectedByHiddenId(searchAssignedStaffElement, selectAssignedStaffElement, employees, (e) => e.callingname, "id", handover.employee_id?.id);
+    setSelectedByHiddenId(
+        searchRentalElement,
+        selectRentalElement,
+        rentals,
+        (r) => r.rent_no,
+        "id",
+        handover.rental_id?.id
+    );
+    // Fill customer
+    searchCustomerElement.value =
+        handover.rental_id.customer_id.firstname + " " +
+        handover.rental_id.customer_id.lastname;
+
+    selectCustomerElement.value =
+        handover.rental_id.customer_id.id;
+
+    // Fill scheduled return date
+    dateScheduledReturnElement.value =
+        handover.rental_id.return_date;
+
+    // Fill contact number
+    textContactNumberElement.value =
+        handover.rental_id.customer_id.mobile;
+
+    // Fill key money
+    textSecurityDepositElement.value =
+        handover.rental_id.keymoney;
+
+    // Load returned items
+    loadRentalItems();
 
     fillSelectFromEnum(selectStatusElement, "handoverStatus", "Please select status...!");
     fillSelectFromEnum(selectItemConditionElement, "itemCondition", "Please select condition...!");
@@ -232,9 +454,7 @@ const refillHandOverForm = (obj) => {
     if (handover.return_person) textReturnPersonElement.value = handover.return_person;
     if (handover.itemCondition) selectItemConditionElement.value = handover.itemCondition;
     if (handover.handoverStatus) selectStatusElement.value = handover.handoverStatus;
-    if (handover.security_deposit) textSecurityDepositElement.value = handover.security_deposit;
     if (handover.damage_charge) textDamageChargesElement.value = handover.damage_charge;
-    if (handover.cleaning_charge) textCleaningChargesElement.value = handover.cleaning_charge;
     if (handover.late_return_fee) textLateReturnFeeElement.value = handover.late_return_fee;
     if (handover.total_refund) textTotalRefundElement.value = handover.total_refund;
     if (handover.receipt_number) textReceiptNumberElement.value = handover.receipt_number;
@@ -251,7 +471,6 @@ const refillHandOverForm = (obj) => {
 const checkHandOverFormErrors = () => {
     let errors = "";
     if (!selectRentalElement.value) errors += "Rental is required.\n";
-    if (!selectAssignedStaffElement.value) errors += "Assigned staff is required.\n";
     if (!selectStatusElement.value) errors += "Status is required.\n";
     return errors;
 };
@@ -260,7 +479,6 @@ const checkHandOverFormErrors = () => {
 const checkHandOverFormUpdates = () => {
     let updates = "";
     if (handover.rental_id?.id != oldHandover.rental_id?.id) updates += "Rental changed\n";
-    if (handover.employee_id?.id != oldHandover.employee_id?.id) updates += "Staff changed\n";
     if (handover.handoverStatus != oldHandover.handoverStatus) updates += "Status changed\n";
     if (handover.actual_return_date != oldHandover.actual_return_date) updates += "Return date changed\n";
     if (handover.actual_return_time != oldHandover.actual_return_time) updates += "Return time changed\n";
@@ -268,7 +486,6 @@ const checkHandOverFormUpdates = () => {
     if (handover.itemCondition != oldHandover.itemCondition) updates += "Item condition changed\n";
     if (handover.security_deposit != oldHandover.security_deposit) updates += "Security deposit changed\n";
     if (handover.damage_charge != oldHandover.damage_charge) updates += "Damage charges changed\n";
-    if (handover.cleaning_charge != oldHandover.cleaning_charge) updates += "Cleaning charges changed\n";
     if (handover.late_return_fee != oldHandover.late_return_fee) updates += "Late return fee changed\n";
     if (handover.total_refund != oldHandover.total_refund) updates += "Total refund changed\n";
     if (handover.damage_description != oldHandover.damage_description) updates += "Damage description changed\n";
@@ -285,6 +502,20 @@ const submitHandOverForm = () => {
     }
     showConfirm("Confirm Submit", "Are you sure you want to create this handover?", "Submit", "success").then(confirmed => {
         if (!confirmed) return;
+
+        handover.damage_description = textDamageDescriptionElement.value.trim();
+        handover.return_note = textReturnNotesElement.value.trim();
+        handover.handoverStatus = selectStatusElement.value;
+
+        if (selectItemConditionElement.value !== "") {
+            handover.itemCondition = selectItemConditionElement.value;
+        }
+
+        handover.damage_charge = parseFloat(textDamageChargesElement.value) || 0;
+        handover.late_return_fee = parseFloat(textLateReturnFeeElement.value) || 0;
+        handover.total_refund = parseFloat(textTotalRefundElement.value) || 0;
+        handover.cleaning_charge = 0;
+
         let serverResponse = getHTTPServicesRequest("/handover/insert", "POST", handover);
         if (serverResponse === "OK") {
             showToast("Handover created successfully!", "success");
@@ -336,3 +567,45 @@ const deleteHandOver = (obj) => {
         }
     });
 };
+
+function calculateLateReturnFee() {
+
+    if (!dateScheduledReturnElement.value || !dateActualReturnElement.value) {
+        return;
+    }
+
+    let scheduledDate = new Date(dateScheduledReturnElement.value);
+    let actualDate = new Date(dateActualReturnElement.value);
+
+    let difference = actualDate - scheduledDate;
+
+    let lateDays = Math.floor(difference / (1000 * 60 * 60 * 24));
+
+    if (lateDays < 0) {
+        lateDays = 0;
+    }
+
+    let lateFee = lateDays * 500;
+
+    textLateReturnFeeElement.value = lateFee;
+    handover.late_return_fee = lateFee;
+
+    calculateTotalRefund();
+}
+
+function calculateTotalRefund() {
+
+    let keyMoney = parseFloat(textSecurityDepositElement.value) || 0;
+    let damage = parseFloat(textDamageChargesElement.value) || 0;
+    let lateFee = parseFloat(textLateReturnFeeElement.value) || 0;
+
+    let refund = keyMoney - damage - lateFee;
+
+    if (refund < 0) {
+        refund = 0;
+    }
+
+    textTotalRefundElement.value = refund.toFixed(2);
+    handover.total_refund = refund;
+}
+

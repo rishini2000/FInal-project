@@ -43,113 +43,142 @@
                     <div class="offcanvas-body">
                         <form id="formPickup" onsubmit="return false;">
                             <!-- Section: Pickup Details -->
-                            <h6 class="form-section-title"><i class="fa-solid fa-hand-holding me-2"></i>Pickup Details</h6>
+                            <h6 class="form-section-title"><i class="fa-solid fa-hand-holding me-2"></i>Pickup Details
+                            </h6>
                             <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="searchCustomer" class="form-label fw-bold">
+                                        Customer <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="fa-solid fa-user"></i>
+                                        </span>
 
-                                        <div class="col-md-6">
-                                            <label for="searchRental" class="form-label fw-bold">Rental <span class="text-danger">*</span></label>
-                                            <div class="input-group">
-                                                <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
-                                                <input type="text" id="searchRental" class="form-control" placeholder="Search rental..." list="listRental">
-                                                <datalist id="listRental"></datalist>
-                                                <input type="hidden" id="selectRental">
-                                            </div>
-                                        </div>
+                                        <input type="text" id="searchCustomer" class="form-control"
+                                            placeholder="Search customer..." list="listCustomer">
 
-                                        <div class="col-md-6">
-                                            <label for="textCustomer" class="form-label fw-bold">Customer</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
-                                                <input type="text" id="textCustomer" class="form-control input-element" readonly>
-                                            </div>
-                                        </div>
+                                        <datalist id="listCustomer"></datalist>
+
+                                        <input type="hidden" id="selectCustomer">
                                     </div>
+                                </div>
 
-                                    <!-- Section: Pickup Person -->
-                                    <hr class="form-section-divider">
-                                    <h6 class="form-section-title"><i class="fa-solid fa-user me-2"></i>Pickup Person</h6>
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Pickup By</label>
-                                            <div class="btn-group w-100" role="group">
-                                                <input type="radio" class="btn-check" name="pickupPersonType" id="radioActualCustomer" checked>
-                                                <label class="btn btn-outline-primary" for="radioActualCustomer"><i class="fa-solid fa-user me-1"></i>Actual Customer</label>
-                                                <input type="radio" class="btn-check" name="pickupPersonType" id="radioOtherPerson">
-                                                <label class="btn btn-outline-primary" for="radioOtherPerson"><i class="fa-solid fa-user-plus me-1"></i>Other Person</label>
-                                            </div>
-                                        </div>
+                                <div class="col-md-6">
+                                    <label for="searchRental" class="form-label fw-bold">
+                                        Rental Code
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="fa-solid fa-magnifying-glass"></i>
+                                        </span>
 
-                                        <div class="col-md-6">
-                                            <label for="textPickupPerson" class="form-label fw-bold">Pickup Person</label>
-                                            <input type="text" id="textPickupPerson" class="form-control input-element">
-                                        </div>
+                                        <input type="text" id="searchRental" class="form-control" readonly>
 
-                                        <div class="col-md-6">
-                                            <label for="textContactNumber" class="form-label fw-bold">Contact Number <span class="text-danger">*</span></label>
-                                            <div class="input-group">
-                                                <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
-                                                <input type="tel" id="textContactNumber" placeholder="Enter contact number" class="form-control input-element" required>
-                                            </div>
-                                        </div>
+                                        <input type="hidden" id="selectRental">
                                     </div>
-
-                                    <!-- Section: Schedule -->
-                                    <hr class="form-section-divider">
-                                    <h6 class="form-section-title"><i class="fa-solid fa-calendar-check me-2"></i>Schedule</h6>
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <label for="searchAssignedStaff" class="form-label fw-bold">Assigned Staff <span class="text-danger">*</span></label>
-                                            <div class="input-group">
-                                                <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
-                                                <input type="text" id="searchAssignedStaff" class="form-control" placeholder="Search staff..." list="listAssignedStaff">
-                                                <datalist id="listAssignedStaff"></datalist>
-                                                <input type="hidden" id="selectAssignedStaff">
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label for="dateScheduledPickup" class="form-label fw-bold">Scheduled Pickup Date <span class="text-danger">*</span></label>
-                                            <div class="input-group">
-                                                <span class="input-group-text"><i class="fa-solid fa-calendar-days"></i></span>
-                                                <input type="date" id="dateScheduledPickup" required class="form-control input-element">
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label for="datetimeActualPickup" class="form-label fw-bold">Actual Pickup Date &amp; Time</label>
-                                            <input type="datetime-local" id="datetimeActualPickup" class="form-control input-element">
-                                        </div>
-                                    </div>
-
-                                    <!-- Section: Pickup Items -->
-                                    <hr class="form-section-divider">
-                                    <div class="inner-section-header">
-                                            <h6><i class="fa-solid fa-box-open me-2"></i>Pickup Item List</h6>
-                                        </div>
-                                        <div class="inner-table-container">
-                                            <table class="modern-table">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Item Name</th>
-                                                        <th>Quantity</th>
-                                                        <th>Pickup ?</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="tableBodyPickupItems">
-                                                </tbody>
-                                            </table>
-                                        </div>
-
-                                    </div>
-                                </form>
-
-                                <div class="panel-footer">
-                                    <button type="button" id="buttonClear" class="btn-clear" onclick="document.getElementById('formPickup')?.reset()">Clear</button>
-                                    <button type="button" id="buttonUpdate" class="btn-update" style="display:none;" onclick="updatePickupForm();">Update</button>
-                                    <button type="button" id="buttonSubmit" class="btn-submit" onclick="submitPickupForm();">Submit</button>
                                 </div>
                             </div>
-                        </div>
+                            <!-- Section: Pickup Person -->
+                            <hr class="form-section-divider">
+                            <h6 class="form-section-title"><i class="fa-solid fa-user me-2"></i>Pickup Person</h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Pickup By</label>
+                                    <div class="btn-group w-100" role="group">
+                                        <input type="radio" class="btn-check" name="pickupPersonType"
+                                            id="radioActualCustomer" checked>
+                                        <label class="btn btn-outline-primary" for="radioActualCustomer"><i
+                                                class="fa-solid fa-user me-1"></i>Actual Customer</label>
+                                        <input type="radio" class="btn-check" name="pickupPersonType"
+                                            id="radioOtherPerson">
+                                        <label class="btn btn-outline-primary" for="radioOtherPerson"><i
+                                                class="fa-solid fa-user-plus me-1"></i>Other Person</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="textPickupPerson" class="form-label fw-bold">Pickup Person</label>
+                                    <input type="text" id="textPickupPerson" class="form-control input-element">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="textContactNumber" class="form-label fw-bold">Contact Number <span
+                                            class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
+                                        <input type="text" id="textContactNumber" class="form-control" maxlength="10"
+                                            autocomplete="off">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section: Schedule -->
+                            <hr class="form-section-divider">
+                            <h6 class="form-section-title"><i class="fa-solid fa-calendar-check me-2"></i>Schedule</h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="dateScheduledPickup" class="form-label fw-bold">Scheduled Pickup Date
+                                        <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-solid fa-calendar-days"></i></span>
+                                        <input type="date" id="dateScheduledPickup" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="datetimeActualPickup" class="form-label fw-bold">Actual Pickup Date
+                                        &amp; Time</label>
+                                    <input type="datetime-local" id="datetimeActualPickup"
+                                        class="form-control input-element">
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    Pickup Status
+                                    <span class="text-danger">*</span>
+                                </label>
+
+                                <select id="selectPickupStatus" class="form-select">
+
+                                    <option value="Scheduled">Scheduled</option>
+                                    <option value="Pending">Pending</option>
+                                    <option value="Picked Up">Picked Up</option>
+
+                                </select>
+
+                            </div>
+
+                            <!-- Section: Pickup Items -->
+                            <hr class="form-section-divider">
+                            <div class="inner-section-header">
+                                <h6><i class="fa-solid fa-box-open me-2"></i>Pickup Item List</h6>
+                            </div>
+                            <div class="inner-table-container">
+                                <table class="modern-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Item Name</th>
+                                            <th>Quantity</th>
+                                            <th>Pickup ?</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tableBodyPickupItems">
+                                    </tbody>
+                                </table>
+                            </div>
+
+                    </div>
+                    </form>
+
+                    <div class="panel-footer">
+                        <button type="button" id="buttonClear" class="btn-clear"
+                            onclick="document.getElementById('formPickup')?.reset()">Clear</button>
+                        <button type="button" id="buttonUpdate" class="btn-update" style="display:none;"
+                            onclick="updatePickupForm();">Update</button>
+                        <button type="button" id="buttonSubmit" class="btn-submit"
+                            onclick="submitPickupForm();">Submit</button>
                     </div>
                 </div>
 
@@ -180,9 +209,12 @@
                         </div>
                     </div>
                 </div>
-                <!-- end table area -->
             </div>
         </div>
+    </div>
+    <!-- end table area -->
+    </div>
+    </div>
     </div>
 
     <div th:replace="~{footer :: footerFragment}"></div>
