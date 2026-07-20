@@ -292,9 +292,11 @@ function checkAppointmentFormErrors() {
     if (!appointment.end_time) {
         errors += "End time is required.\n";
     }
-    if (!Array.isArray(appointment.servicepackage_list) || appointment.servicepackage_list.length === 0) {
-        errors += "Please select at least one service package..!\n";
-    }
+if (!Array.isArray(appointment.appointmentHasServicePackageList) ||
+    appointment.appointmentHasServicePackageList.length === 0) {
+
+    errors += "Please select at least one service package..!\n";
+}
     if (!appointment.duration || isNaN(appointment.duration) || appointment.duration <= 0) {
         errors += "Please enter a valid duration in minutes..!\n";
     }
@@ -481,8 +483,9 @@ const checkFormUpdates = () => {
         if (appointment.end_time !== oldAppointment.end_time) {
         updates += "End time changed from " + oldAppointment.end_time + " to " + appointment.end_time + "\n";
     }
-        if (JSON.stringify(appointment.servicepackage_list) !== JSON.stringify(oldAppointment.servicepackage_list)) {
-        updates += "Service packages changed from " + JSON.stringify(oldAppointment.servicepackage_list) + " to " + JSON.stringify(appointment.servicepackage_list) + "\n";
+        if (JSON.stringify(appointment.appointmentHasServicePackageList) !==
+    JSON.stringify(oldAppointment.appointmentHasServicePackageList)) {
+        updates += "Service packages changed from " + JSON.stringify(oldAppointment.appointmentHasServicePackageList) + " to " + JSON.stringify(appointment.appointmentHasServicePackageList) + "\n";
     }
         if (appointment.duration !== oldAppointment.duration) {
         updates += "Duration changed from " + oldAppointment.duration + " to " + appointment.duration + "\n";

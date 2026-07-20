@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
-<head th:replace="~{header :: headerFragment}"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<head th:replace="~{header :: headerFragment}">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
 
 <body>
     <div class="app-layout">
@@ -116,9 +119,16 @@
                                         <i class="fa-solid fa-money-bill me-1"></i>
                                         Rental Price <span class="text-danger">*</span>
                                     </label>
-
                                     <input type="number" id="textRentalPrice" class="form-control input-element"
                                         placeholder="Enter rental price">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="textKeyMoney" class="form-label">
+                                        <i class="fa-solid fa-money-bill me-1"></i>
+                                        Key Money <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="number" id="textKeyMoney" class="form-control input-element"
+                                        placeholder="Enter key money">
                                 </div>
                             </div>
 

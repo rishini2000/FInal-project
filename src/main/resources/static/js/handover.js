@@ -344,10 +344,6 @@ function loadRentalItems() {
             let row = document.createElement("tr");
             row.innerHTML = `
 <td>${itemRow.item_id.item_name}</td>
-<td>${itemRow.quantity}</td>
-<td>
-    <input type="number" min="0" max="${itemRow.quantity}" value="${itemRow.quantity}" class="form-control">
-</td>
 <td>
     <input type="checkbox" checked class="form-check-input">
 </td>

@@ -10,6 +10,7 @@ let textItemNameElement = document.querySelector("#textItemName");
 let selectSizeElement = document.querySelector("#selectSize");
 let selectStatusElement = document.querySelector("#selectStatus");
 let textRentalPriceElement = document.querySelector("#textRentalPrice");
+let textKeyMoneyElement = document.querySelector("#textKeyMoney");
 let textNotesElement = document.querySelector("#textNotes");
 let tableBodyItem = document.querySelector("#tableBodyItem");
 
@@ -38,7 +39,7 @@ function refreshItemForm() {
     clearValidation(selectSizeElement);
     clearValidation(selectStatusElement);
     clearValidation(textRentalPriceElement);
-    clearElement([textNotesElement]);
+    clearElement([textNotesElement, textRentalPriceElement, textKeyMoneyElement]);
 }
 
 // define function for Refresh the item table
@@ -129,6 +130,26 @@ textRentalPriceElement.addEventListener("keyup", () => {
 
 });
 
+textKeyMoneyElement.addEventListener("keyup", () => {
+
+    let keyMoney = textKeyMoneyElement.value.trim();
+
+    if (keyMoney != "" && Number(keyMoney) > 0) {
+
+        item.key_money = Number(keyMoney);
+
+        setValid(textKeyMoneyElement);
+
+    } else {
+
+        item.key_money = null;
+
+        setInvalid(textKeyMoneyElement);
+
+    }
+
+});
+
 textNotesElement.addEventListener("keyup", () => {
     item.note = textNotesElement.value;
 });
@@ -151,6 +172,9 @@ function checkFormError() {
     }
     if (item.rental_price == null) {
         errors += "Rental price is required..!\n";
+    }
+    if (item.key_money == null) {
+        errors += "Key money is required..!\n";
     }
     return errors;
 }
@@ -233,8 +257,9 @@ const refillItemForm = (dataObject) => {
     oldItem = JSON.parse(JSON.stringify(dataObject));
 
     textItemNameElement.value = item.item_name;
-    textRentalPriceElement.value = item.rental_price;
     textNotesElement.value = item.note;
+    textRentalPriceElement.value = item.rental_price;
+    textKeyMoneyElement.value = item.key_money;
 
     fillSelectFromEnum(selectCategoryElement, "itemCategory", "Please select category...!");
     fillSelectFromEnum(selectStatusElement, "itemStatus", "Please select status...!");
@@ -289,6 +314,9 @@ const checkFormUpdates = () => {
     }
     if (item.rental_price != oldItem.rental_price) {
         updates += "Rental price changed from " + oldItem.rental_price + " to " + item.rental_price + "\n";
+    }
+    if (item.key_money != oldItem.key_money) {
+        updates += "Key money changed from " + oldItem.key_money + " to " + item.key_money + "\n";
     }
     if (item.note != oldItem.note) {
         updates += "Notes changed from " + oldItem.note + " to " + item.note + "\n";

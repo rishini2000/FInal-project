@@ -122,12 +122,12 @@
                             <h6 class="form-section-title"><i class="fa-solid fa-coins me-2"></i>Financial</h6>
                             <div class="row g-3">
                                 <div class="col-md-4">
-                                    <label for="textKeyMoney" class="form-label fw-bold">Key Money <span
+                                    <label for="textKeyMoney" class="form-label fw-bold">Total Key Money <span
                                             class="text-danger">*</span></label>
                                     <div class="input-group">
                                         <span class="input-group-text currency">Rs.</span>
-                                        <input type="number" id="textKeyMoney" required placeholder="0.00"
-                                            class="form-control input-element" step="0.01" min="0">
+                                        <input type="number" id="textKeyMoney" class="form-control input-element"
+                                            step="0.01" min="0" readonly>
                                     </div>
                                 </div>
 
@@ -136,8 +136,8 @@
                                             class="text-danger">*</span></label>
                                     <div class="input-group">
                                         <span class="input-group-text currency">Rs.</span>
-                                        <input type="number" id="textTotalCharge" required placeholder="0.00"
-                                            class="form-control input-element" step="0.01" min="0">
+                                        <input type="number" id="textTotalCharge" class="form-control input-element"
+                                            step="0.01" min="0" readonly>
                                     </div>
                                 </div>
 
@@ -215,14 +215,17 @@
                                             <label for="textItemPrice" class="form-label fw-bold">Item Price</label>
                                             <div class="input-group">
                                                 <span class="input-group-text currency">Rs.</span>
-                                                <input type="number" id="textItemPrice" placeholder="0.00"
-                                                    class="form-control" step="0.01" min="0">
+                                                <input type="number" id="textItemPrice" class="form-control" readonly>
                                             </div>
                                         </div>
                                         <div class="col-md-4">
-                                            <label for="textItemQty" class="form-label fw-bold">Quantity</label>
-                                            <input type="number" id="textItemQty" placeholder="1" class="form-control"
-                                                min="1" value="1">
+                                            <label for="textItemKeyMoney" class="form-label fw-bold">Item Key
+                                                Money</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text currency">Rs.</span>
+                                                <input type="number" id="textItemKeyMoney" class="form-control"
+                                                    readonly>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -233,8 +236,7 @@
                                             <th>Item Code</th>
                                             <th>Item Name</th>
                                             <th>Price (Rs.)</th>
-                                            <th>Quantity</th>
-                                            <th>Total (Rs.)</th>
+                                            <th>Key Money (Rs.)</th>
                                             <th>Alteration</th>
                                             <th>Alteration Note</th>
                                             <th>Action</th>

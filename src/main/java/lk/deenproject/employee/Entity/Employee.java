@@ -111,4 +111,27 @@ public class Employee {
         this.employeeStatus = employeeStatus;
         this.dob = dob;
     }
+
+    public Employee(Integer id,
+            String empno,
+            String fullname,
+            String callingname,
+            String nic,
+            String email,
+            String mobileno,
+            Designation designation,
+            EmployeeStatus employeeStatus,
+            LocalDate dob) {
+
+        this.id = id;
+        this.empno = empno;
+        this.fullname = fullname;
+        this.callingname = callingname;
+        this.nic = nic;
+        this.email = email;
+        this.mobile = mobileno;
+        this.designation = designation;
+        this.employeeStatus = employeeStatus;
+        this.dob = dob;
+    }
 }

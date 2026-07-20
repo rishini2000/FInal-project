@@ -20,10 +20,20 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
     @Query(value = "SELECT e FROM Employee e WHERE e.email=?1")
     Employee getByEmail(String email);
 
-@Query("SELECT new Employee(e.id, e.empno, e.fullname, e.nic, e.email, e.mobile, e.designation, e.employeeStatus, e.dob) " +
-       "FROM Employee e " +
-       "WHERE e.employeeStatus = lk.deenproject.enums.EmployeeStatus.ACTIVE")
-List<Employee> getSelectedColumn();
+    @Query("SELECT new Employee(" +
+            "e.id, " +
+            "e.empno, " +
+            "e.fullname, " +
+            "e.callingname, " +
+            "e.nic, " +
+            "e.email, " +
+            "e.mobile, " +
+            "e.designation, " +
+            "e.employeeStatus, " +
+            "e.dob) " +
+            "FROM Employee e " +
+            "WHERE e.employeeStatus = lk.deenproject.enums.EmployeeStatus.ACTIVE")
+    List<Employee> getSelectedColumn();
 
     @Query(value = "SELECT e FROM Employee e WHERE e.designation = ?1")
     List<Employee> getByDesignation(String beautician);

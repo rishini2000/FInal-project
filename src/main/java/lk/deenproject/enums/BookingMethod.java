@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum BookingMethod {
     PHONE("Phone"),
-    WALK_IN("Walk-in"),
-    ONLINE("Online");
+    WALK_IN("Walk-in");
+    // ONLINE("Online");
 
     private final String displayName;
 

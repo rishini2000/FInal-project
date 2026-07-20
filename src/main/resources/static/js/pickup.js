@@ -557,7 +557,6 @@ function refreshPickupItemsTable(selectedRental) {
 
         row.innerHTML = `
             <td>${itemRow.item_id.item_name}</td>
-            <td>${itemRow.quantity}</td>
             <td>
                 <input type="checkbox" class="form-check-input">
             </td>

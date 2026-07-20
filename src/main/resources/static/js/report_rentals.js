@@ -48,7 +48,7 @@ function renderTable(data) {
 const printRentalRow = (obj) => {
     const items = obj.rentalHasItemList || [];
     let itemRows = items.map(item =>
-        `<tr><td>${escapeHtml(item.item_id ? item.item_id.itemcode : "")}</td><td>${escapeHtml(item.item_id ? item.item_id.item_name : "")}</td><td>${escapeHtml(item.quantity || 1)}</td></tr>`
+        `<tr><td>${escapeHtml(item.item_id ? item.item_id.itemcode : "")}</td><td>${escapeHtml(item.item_id ? item.item_id.item_name : "")}</td></tr>`
     ).join("");
     const newTab = window.open();
     newTab.document.write(`<!DOCTYPE html><html><head><title>Rental ${escapeHtml(obj.rent_no || "")}</title>

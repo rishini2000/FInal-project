@@ -100,11 +100,18 @@ public class LeavePlanController extends BaseController<LeavePlan, Integer> {
             return error("delete", "Leave Plan with the given ID does not exist.");
         }
 
-        try {
-            leavePlanDao.delete(leavePlan);
-            return success();
-        } catch (Exception e) {
-            return error("delete", e.getMessage());
-        }
+try {
+
+    // Delete all leave days belonging to this leave plan
+    leaveDayDao.deleteLeaveDaysByLeavePlanId(leavePlan.getId());
+
+    // Then delete the leave plan
+    leavePlanDao.deleteById(leavePlan.getId());
+
+    return success();
+
+} catch (Exception e) {
+    return error("delete", e.getMessage());
+}
     }
 }

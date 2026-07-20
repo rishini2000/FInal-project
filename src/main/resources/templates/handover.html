@@ -47,15 +47,15 @@
                             </h6>
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label for="searchCustomer" class="form-label fw-bold">
+                                        <label for="searchCustomer" class="form-label fw-bold">
                                         Customer <span class="text-danger">*</span>
                                     </label>
                                     <div class="input-group">
                                         <span class="input-group-text">
                                             <i class="fa-solid fa-user"></i>
                                         </span>
-                                        <input type="text" id="searchCustomer" list="listCustomer">
-                                        <datalist id="listCustomer"></datalist>
+                                        <input type="text" id="searchCustomer" class="form-control"
+                                            placeholder="Search customer..." list="listCustomer">
                                         <input type="hidden" id="selectCustomer">
                                     </div>
                                 </div>
@@ -222,8 +222,6 @@
                                     <thead>
                                         <tr>
                                             <th>Item Name</th>
-                                            <th>Rental Qty</th>
-                                            <th>Returned Qty</th>
                                             <th>Returned ?</th>
                                             <th>Condition</th>
                                         </tr>

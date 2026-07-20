@@ -99,15 +99,15 @@ INSERT IGNORE INTO `employee` (`empno`, `fullname`, `callingname`, `nic`, `mobil
 ('EMP00006', 'Sanduni Perera', 'Sanduni', '945678123V', 716789012, '1994-09-12', '89 Hill Street, Jaffna', 'sanduni@salondeen.lk', NOW(), 5, 1);
 
 -- Items (9 records)
-INSERT IGNORE INTO `item` (`itemcode`, `item_name`, `note`, `addeddatetime`, `item_category`, `item_status`, `rental_price`, `item_size`) VALUES
-('ITM10001', 'Classic White Wedding Gown', 'A-line silhouette with lace details', NOW(), 'Wedding Dresses', 'Available', 15000.00, 'M'),
-('ITM10002', 'Vintage Lace Wedding Dress', 'Victorian-inspired with long sleeves', NOW(), 'Wedding Dresses', 'Available', 18000.00, 'S'),
-('ITM10003', 'Crystal Tiara Set', 'Silver crystal tiara with matching earrings', NOW(), 'Accessories', 'Available', 3500.00, 'M'),
-('ITM10004', 'Pearl Necklace Set', 'Freshwater pearl necklace with bracelet', NOW(), 'Jewelry', 'Available', 2500.00, 'M'),
-('ITM10005', 'Bridal Shoes - Ivory Heels', 'Satin heels with pearl embellishments', NOW(), 'Shoes', 'Rented', 4000.00, 'S'),
-('ITM10006', 'Flower Crown - Rose Gold', 'Artificial flowers with gold leaves', NOW(), 'Accessories', 'Available', 2000.00, 'M'),
-('ITM10007', 'Diamond Stud Earrings', 'Cubic zirconia silver studs', NOW(), 'Jewelry', 'Available', 3000.00, 'M'),
-('ITM10008', 'Embroidered Clutch Bag', 'Silk clutch with beadwork', NOW(), 'Accessories', 'Under Maintenance', 2500.00, 'M');
+INSERT IGNORE INTO `item` (`itemcode`, `item_name`, `note`, `addeddatetime`, `item_category`, `item_status`, `rental_price`, `key_money`, `item_size`) VALUES
+('ITM10001', 'Classic White Wedding Gown', 'A-line silhouette with lace details', NOW(), 'Wedding Dresses', 'Available', 15000.00, 5000.00, 'M'),
+('ITM10002', 'Vintage Lace Wedding Dress', 'Victorian-inspired with long sleeves', NOW(), 'Wedding Dresses', 'Available', 18000.00, 6000.00, 'S'),
+('ITM10003', 'Crystal Tiara Set', 'Silver crystal tiara with matching earrings', NOW(), 'Accessories', 'Available', 3500.00, 1000.00, 'M'),
+('ITM10004', 'Pearl Necklace Set', 'Freshwater pearl necklace with bracelet', NOW(), 'Jewelry', 'Available', 2500.00, 1500.00, 'M'),
+('ITM10005', 'Bridal Shoes - Ivory Heels', 'Satin heels with pearl embellishments', NOW(), 'Shoes', 'Rented', 4000.00, 800.00, 'S'),
+('ITM10006', 'Flower Crown - Rose Gold', 'Artificial flowers with gold leaves', NOW(), 'Accessories', 'Available', 2000.00, 500.00, 'M'),
+('ITM10007', 'Diamond Stud Earrings', 'Cubic zirconia silver studs', NOW(), 'Jewelry', 'Available', 3000.00, 1200.00, 'M'),
+('ITM10008', 'Embroidered Clutch Bag', 'Silk clutch with beadwork', NOW(), 'Accessories', 'Under Maintenance', 2500.00, 600.00, 'M');
 
 -- Services (10 records)
 INSERT IGNORE INTO `service` (`servicecode`, `name`, `duration`, `price`, `description`, `addeddatetime`, `service_category_id`, `service_status_id`) VALUES
@@ -230,17 +230,17 @@ INSERT IGNORE INTO `handover` (`id`, `actual_return_date`, `actual_return_time`,
 (3, '2025-07-11', '14:00:00', 'Amasha Jayawardena', 2000.00, 500.00, 0.00, 37500.00, 'Small tear on hem', 'Minor damage noted', '2025-07-11 14:00:00', 1, 2, 3);
 
 -- Rental Has Item (10 records)
-INSERT IGNORE INTO `rental_has_item` (`rental_id`, `item_id`, `alteration_required`, `alteration_note`, `item_price`, `quantity`, `is_pickup`) VALUES
-(1, 1, 0, NULL, 15000.00, 1, 1),
-(1, 3, 0, NULL, 5000.00, 1, 1),
-(2, 3, 0, NULL, 5000.00, 1, 1),
-(2, 4, 0, NULL, 7000.00, 1, 1),
-(3, 2, 1, 'Hem adjustment needed', 12000.00, 1, 1),
-(3, 6, 0, NULL, 2000.00, 1, 1),
-(4, 5, 0, NULL, 3000.00, 1, 0),
-(5, 4, 0, NULL, 7000.00, 1, 0),
-(6, 6, 0, NULL, 2000.00, 1, 0),
-(6, 7, 0, NULL, 3500.00, 1, 0);
+INSERT IGNORE INTO `rental_has_item` (`rental_id`, `item_id`, `alteration_required`, `alteration_note`, `item_price`, `key_money`, `is_pickup`) VALUES
+(1, 1, 0, NULL, 15000.00, 5000.00, 1),
+(1, 3, 0, NULL, 5000.00, 1000.00, 1),
+(2, 3, 0, NULL, 5000.00, 1000.00, 1),
+(2, 4, 0, NULL, 7000.00, 1500.00, 1),
+(3, 2, 1, 'Hem adjustment needed', 12000.00, 3000.00, 1),
+(3, 6, 0, NULL, 2000.00, 500.00, 1),
+(4, 5, 0, NULL, 3000.00, 800.00, 0),
+(5, 4, 0, NULL, 7000.00, 1500.00, 0),
+(6, 6, 0, NULL, 2000.00, 500.00, 0),
+(6, 7, 0, NULL, 3500.00, 1000.00, 0);
 
 -- Leave Days (6 records)
 INSERT IGNORE INTO `leave_day` (`leave_date`, `leave_type`, `start_time`, `end_time`, `leave_plan_id`) VALUES

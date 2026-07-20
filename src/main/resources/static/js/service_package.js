@@ -46,17 +46,11 @@ function refreshServicePackageForm() {
     buttonSubmit.style.display = "block";
 
     fillSelectFromEnum(selectPackageStatusElement, "servicePackageStatus", "Please select status...!");
-    fillSelectFromEnum(selectServiceCategoryElement, "serviceCategory", "Please select category...!");
+    fillSelectFromEnum(selectServiceCategoryElement,
+        "serviceCategory",
+        "Please select category...!");
+    selectServiceCategoryElement.addEventListener("change", loadServicesByCategory);
 
-    let services = getServiceRequest("/service/alldata");
-    populateDataList(
-        listServiceItemElement,
-        searchServiceItemElement,
-        selectServiceItemElement,
-        services,
-        (s) => s.name + " (" + s.servicecode + ")",
-        "id"
-    );
 
     clearElement([textPackageNameElement, textDurationElement, selectPackageStatusElement, textNotesElement, textDefaultPriceElement]);
 
@@ -96,13 +90,13 @@ const getServiceName = (sp) => {
 }
 
 // Bind inputs
-document.querySelector("#textPackageName").addEventListener("input", function() { servicePackage.package_name = this.value; });
-document.querySelector("#textNotes").addEventListener("input", function() { servicePackage.notes = this.value; });
-document.querySelector("#textDefaultPrice").addEventListener("input", function() {
+document.querySelector("#textPackageName").addEventListener("input", function () { servicePackage.package_name = this.value; });
+document.querySelector("#textNotes").addEventListener("input", function () { servicePackage.notes = this.value; });
+document.querySelector("#textDefaultPrice").addEventListener("input", function () {
     servicePackage.default_price = this.value;
     updateDiscountDisplay();
 });
-document.querySelector("#selectPackageStatus").addEventListener("change", function() { servicePackage.servicePackageStatus = this.value; setValid(this); });
+document.querySelector("#selectPackageStatus").addEventListener("change", function () { servicePackage.servicePackageStatus = this.value; setValid(this); });
 
 function checkServicePackageFormErrors() {
     let errors = "";
@@ -221,6 +215,10 @@ function refillServicePackageForm(obj) {
     openPanel('panelServicePackageForm');
 
     refreshServicePackageInnerTable();
+
+    // Auto-fill today's date
+    datePromoStartElement.value = new Date().toISOString().split("T")[0];
+
     refreshPromoPriceTable();
     recalculateDuration();
     updateDiscountDisplay();
@@ -299,10 +297,16 @@ function addServiceToList() {
     showConfirm("Add Service", "Add this service to the package?", "Add", "primary").then(confirmed => {
         if (!confirmed) return;
 
-        let innerItem = new Object();
-        innerItem.service_id = JSON.parse(selectServiceItemElement.value);
-        servicePackage.servicePackageHasServiceList.push(innerItem);
+        let allServices = getServiceRequest("/service/alldata");
 
+        let selectedService = allServices.find(service =>
+            service.id == selectServiceItemElement.value
+        );
+
+        let innerItem = new Object();
+        innerItem.service_id = selectedService;
+
+        servicePackage.servicePackageHasServiceList.push(innerItem);
         showToast("Service added!", "success");
         refreshServicePackageInnerForm();
         refreshServicePackageInnerTable();
@@ -347,11 +351,16 @@ function recalculateDuration() {
 function updateDiscountDisplay() {
     const list = servicePackage.servicePackageHasServiceList || [];
     let totalServiceValue = 0;
+
     list.forEach(item => {
         if (item.service_id && item.service_id.price) {
             totalServiceValue += parseFloat(item.service_id.price) || 0;
         }
     });
+
+    // Auto-fill Default Price
+    servicePackage.default_price = totalServiceValue;
+    textDefaultPriceElement.value = totalServiceValue > 0 ? totalServiceValue.toFixed(2) : "";
 
     const defaultPrice = parseFloat(servicePackage.default_price) || 0;
 
@@ -425,4 +434,24 @@ function deletePromoPrice(obj) {
     });
 }
 
+
+function loadServicesByCategory() {
+
+    let category = selectServiceCategoryElement.value;
+
+    let allServices = getServiceRequest("/service/alldata");
+
+    let filteredServices = allServices.filter(service =>
+        service.serviceCategory == category
+    );
+
+    populateDataList(
+        listServiceItemElement,
+        searchServiceItemElement,
+        selectServiceItemElement,
+        filteredServices,
+        (service) => service.name + " (" + service.servicecode + ")",
+        "id"
+    );
+}
 //***********end of the promotional pricing area*************

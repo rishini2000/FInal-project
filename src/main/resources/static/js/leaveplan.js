@@ -150,7 +150,7 @@ const refreshMonthlyAvailablePlanForm = () => {
         searchEmployeeElement,
         selectEmployeeHidden,
         employees,
-        (emp) => emp.empno + " - " + emp.callingname,
+        (emp) => emp.empno + " - " + emp.fullname,
         "id"
     );
 
@@ -206,7 +206,7 @@ const getEmpNo = (plan) => {
 }
 
 const getEmployeeName = (plan) => {
-    return plan.employee_id.callingname;
+    return plan.employee_id.fullname;
 }
 
 const getMonth = (plan) => {
@@ -372,13 +372,14 @@ const refillLeavePlanForm = (ob) => {
         searchEmployeeElement,
         selectEmployeeHidden,
         employees,
-        (emp) => emp.empno + " - " + emp.callingname,
+        (emp) => emp.empno + " - " + emp.fullname,
         "id"
     );
 
     // Set form fields
     if (leavePlan.monthYear) inputMonthElement.value = leavePlan.monthYear;
-    if (leavePlan.employee_id) setSelectedByHiddenId(searchEmployeeElement, selectEmployeeHidden, employees, (emp) => emp.empno + " - " + emp.callingname, "id", leavePlan.employee_id.id);
+    if (leavePlan.employee_id) 
+        setSelectedByHiddenId(searchEmployeeElement, selectEmployeeHidden, employees, (emp) => emp.empno + " - " + emp.fullname, "id", leavePlan.employee_id.id);
     if (leavePlan.leaveType) selectLeaveTypeElement.value = leavePlan.leaveType;
 
     buttonUpdate.style.display = "inline-block";

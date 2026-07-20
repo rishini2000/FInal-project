@@ -38,7 +38,7 @@ const selectItemCategoryElement = document.querySelector("#selectItemCategory");
 selectItemCategoryElement.addEventListener("change", filterItemsByCategory);
 
 const textItemPriceElement = document.querySelector("#textItemPrice");
-const textItemQtyElement = document.querySelector("#textItemQty");
+const textItemKeyMoneyElement = document.querySelector("#textItemKeyMoney");
 const textAlterationNoteElement = document.querySelector("#textAlterationNote");
 const switchAlterationElement = document.querySelector("#switchAlterationRequired");
 switchAlterationElement.addEventListener("change", () => {
@@ -114,6 +114,11 @@ function refreshRentalForm() {
 
     // Prevent selecting past dates for Appointment Date
     let today = new Date().toISOString().split("T")[0];
+
+    // Auto-fill Appointment Date with today's date
+    dateAppointmentElement.value = today;
+    rental.appointment_date = today;
+
 
     dateAppointmentElement.min = today;
     dateFunctionElement.min = today;
@@ -538,8 +543,6 @@ function printRental(obj) {
             <td>${escapeHtml(item.item_id ? item.item_id.itemcode : "")}</td>
             <td>${escapeHtml(item.item_id ? item.item_id.item_name : "")}</td>
             <td>Rs. ${formatCurrency(item.item_price)}</td>
-            <td>${escapeHtml(item.quantity)}</td>
-            <td>Rs. ${formatCurrency(item.item_price * item.quantity)}</td>
         </tr>`
     ).join("");
 
@@ -574,7 +577,7 @@ function printRental(obj) {
         </table>
         ${items.length > 0 ? `<h6 class="mt-3 mb-2"><i class="fa-solid fa-box-open me-2"></i>Rental Items</h6>
         <table class="table table-bordered">
-            <thead><tr><th>Item Code</th><th>Item Name</th><th>Price</th><th>Quantity</th><th>Line Total</th></tr></thead>
+            <thead><tr><th>Item Code</th><th>Item Name</th><th>Price</th><th>Line Total</th></tr></thead>
             <tbody>${itemRows}</tbody>
         </table>` : ""}
         </div>
@@ -715,7 +718,6 @@ function checkFormError() {
     let errors = "";
     if (!hiddenItemElement.value) errors += "Item is required.\n";
     if (!textItemPriceElement.value || textItemPriceElement.value <= 0) errors += "Item price is required.\n";
-    if (!textItemQtyElement.value || textItemQtyElement.value <= 0) errors += "Quantity is required.\n";
     return errors;
 }
 
@@ -743,16 +745,17 @@ function refreshRentalInnerForm() {
         "id"
     );
 
-    clearElement([selectItemCategoryElement, textItemPriceElement, textItemQtyElement, textAlterationNoteElement]);
-    textItemQtyElement.value = 1;
+    clearElement([
+        selectItemCategoryElement,
+        textItemPriceElement,
+        textItemKeyMoneyElement,
+        textAlterationNoteElement
+    ]);
     textTotalChargeElement.value = rental.total_charge;
     clearValidation(searchItemElement);
 
     // Clear hidden item id
     hiddenItemElement.value = "";
-
-    // Reset quantity
-    textItemQtyElement.value = 1;
 
     // Reset alteration switch
     switchAlterationElement.checked = false;
@@ -774,11 +777,10 @@ function refreshRentalInnerTable() {
     const propertyList = [
         { propertyName: getItemCode, dataType: "function" },
         { propertyName: getItemName, dataType: "function" },
-        { propertyName: "item_price", dataType: "string" },
-        { propertyName: "quantity", dataType: "string" },
+        { propertyName: "item_price", dataType: "currency" },
+        { propertyName: "key_money", dataType: "currency" },
         { propertyName: getAlteration, dataType: "function" },
-        { propertyName: getAlterationNote, dataType: "function" },
-        { propertyName: getTotal, dataType: "function" }
+        { propertyName: getAlterationNote, dataType: "function" }
     ];
     fillDataIntoInnerTable(tableBodySelectedItemsInnerForm, rental.rentalHasItemList, propertyList, refillRentalInnerForm, deleteRentalItem);
 
@@ -807,7 +809,7 @@ const getItemName = (obj) => {
 }
 
 const getTotal = (obj) => {
-    return obj.item_price * obj.quantity;
+    return obj.item_price;
 }
 
 //define function for submit new rental item detail
@@ -823,14 +825,13 @@ function buttonInnerRentalSubmit() {
             rentalInner.alteration_note = textAlterationNoteElement ? textAlterationNoteElement.value : "";
 
             rentalInner.item_price = Number(textItemPriceElement.value);
-            rentalInner.quantity = Number(textItemQtyElement.value);
 
             rental.rentalHasItemList.push(rentalInner);
 
             let total = 0;
 
             rental.rentalHasItemList.forEach(item => {
-                total += Number(item.item_price) * Number(item.quantity);
+                total += Number(item.item_price);
             });
 
             textTotalChargeElement.value = total;
@@ -850,13 +851,33 @@ function buttonInnerRentalSubmit() {
 
 //define function for delete rental item detail
 function deleteRentalItem(obj) {
+
     showConfirm("Delete Item", "Are you sure to delete this item from rental?", "Delete", "danger").then(confirmed => {
         if (!confirmed) return;
 
         const idx = rental.rentalHasItemList.indexOf(obj);
+
         if (idx > -1) {
             rental.rentalHasItemList.splice(idx, 1);
         }
+
+        // Recalculate Total Charge and Total Key Money
+        let totalCharge = 0;
+        let totalKeyMoney = 0;
+
+        rental.rentalHasItemList.forEach(item => {
+
+            totalCharge += Number(item.item_price);
+            totalKeyMoney += Number(item.key_money);
+
+        });
+
+        textTotalChargeElement.value = totalCharge;
+        rental.total_charge = totalCharge;
+
+        textKeyMoneyElement.value = totalKeyMoney;
+        rental.keymoney = totalKeyMoney;
+
         showToast("Item removed from rental successfully!", "success");
 
         refreshRentalInnerForm();
@@ -882,7 +903,6 @@ function refillRentalInnerForm(obj) {
     setSelectedByHiddenId(searchItemElement, hiddenItemElement, items, (item) => item.item_name + " (" + item.itemcode + ")", "id", innerRental.item_id?.id);
 
     textItemPriceElement.value = innerRental.item_price || "";
-    textItemQtyElement.value = innerRental.quantity || 1;
 
     // Set alteration fields if present
     if (switchAlterationElement) switchAlterationElement.checked = !!innerRental.alteration_required;
@@ -904,9 +924,6 @@ const checkFormUpdate = () => {
     if (textItemPriceElement.value != oldInnerRental.item_price) {
         updates += "Price changed from " + oldInnerRental.item_price + " to " + textItemPriceElement.value + "\n";
     }
-    if (textItemQtyElement.value != oldInnerRental.quantity) {
-        updates += "Quantity changed from " + oldInnerRental.quantity + " to " + textItemQtyElement.value + "\n";
-    }
     return updates;
 }
 
@@ -927,7 +944,6 @@ function buttonInnerUpdate() {
                 if (idx > -1) {
                     innerRental.item_id = { id: parseInt(hiddenItemElement.value) };
                     innerRental.item_price = textItemPriceElement.value;
-                    innerRental.quantity = textItemQtyElement.value;
                     innerRental.alteration_required = switchAlterationElement.checked;
                     innerRental.alteration_note = textAlterationNoteElement.value;
                     rental.rentalHasItemList[idx] = innerRental;
@@ -955,15 +971,14 @@ function addSelectedItem() {
     rentalInner.item_id = selectedItem;
 
     rentalInner.item_price = textItemPriceElement.value;
+    rentalInner.key_money = Number(textItemKeyMoneyElement.value);
 
-    rentalInner.quantity = textItemQtyElement.value;
 
     console.log(rentalInner);
 
     rentalInner.alteration_required = switchAlterationElement.checked;
 
-    rentalInner.alteration_note =
-        textAlterationNoteElement.value;
+    rentalInner.alteration_note = textAlterationNoteElement.value;
 
     rental.rentalHasItemList.push(rentalInner);
 
@@ -971,11 +986,20 @@ function addSelectedItem() {
     let total = 0;
 
     rental.rentalHasItemList.forEach(item => {
-        total += Number(item.item_price) * Number(item.quantity);
+        total += Number(item.item_price);
     });
 
     textTotalChargeElement.value = total;
     rental.total_charge = total;
+
+    let totalKeyMoney = 0;
+
+    rental.rentalHasItemList.forEach(item => {
+        totalKeyMoney += Number(item.key_money);
+    });
+
+    textKeyMoneyElement.value = totalKeyMoney;
+    rental.keymoney = totalKeyMoney;
 
     refreshRentalInnerTable();
     refreshRentalInnerForm();
@@ -1015,6 +1039,12 @@ function filterItemsByCategory() {
             rentalInner.item_price = Number(selectedItem.rental_price);
             textItemPriceElement.value = Number(selectedItem.rental_price);
 
+            textItemKeyMoneyElement.value =
+                Number(selectedItem.key_money);
+
+            rentalInner.key_money =
+                Number(selectedItem.key_money);
+
             console.log("Selected Item =", selectedItem);
         }
 
@@ -1025,10 +1055,10 @@ function filterItemsByCategory() {
 function validateAppointmentDate() {
 
     let today = new Date();
-    today.setHours(0,0,0,0);
+    today.setHours(0, 0, 0, 0);
 
     let appointmentDate = new Date(dateAppointmentElement.value);
-    appointmentDate.setHours(0,0,0,0);
+    appointmentDate.setHours(0, 0, 0, 0);
 
     if (appointmentDate < today) {
 
@@ -1049,8 +1079,8 @@ function validateFunctionDate() {
     let appointmentDate = new Date(dateAppointmentElement.value);
     let functionDate = new Date(dateFunctionElement.value);
 
-    appointmentDate.setHours(0,0,0,0);
-    functionDate.setHours(0,0,0,0);
+    appointmentDate.setHours(0, 0, 0, 0);
+    functionDate.setHours(0, 0, 0, 0);
 
     if (functionDate < appointmentDate) {
         setInvalid(dateFunctionElement);
@@ -1068,9 +1098,9 @@ function validateFittonDate() {
     let fittonDate = new Date(dateFittonElement.value);
     let functionDate = new Date(dateFunctionElement.value);
 
-    appointmentDate.setHours(0,0,0,0);
-    fittonDate.setHours(0,0,0,0);
-    functionDate.setHours(0,0,0,0);
+    appointmentDate.setHours(0, 0, 0, 0);
+    fittonDate.setHours(0, 0, 0, 0);
+    functionDate.setHours(0, 0, 0, 0);
 
     if (fittonDate < appointmentDate || fittonDate > functionDate) {
         setInvalid(dateFittonElement);
@@ -1089,10 +1119,10 @@ function validatePickupDate() {
     let fittonDate = new Date(dateFittonElement.value);
     let functionDate = new Date(dateFunctionElement.value);
 
-    pickupDate.setHours(0,0,0,0);
-    appointmentDate.setHours(0,0,0,0);
-    fittonDate.setHours(0,0,0,0);
-    functionDate.setHours(0,0,0,0);
+    pickupDate.setHours(0, 0, 0, 0);
+    appointmentDate.setHours(0, 0, 0, 0);
+    fittonDate.setHours(0, 0, 0, 0);
+    functionDate.setHours(0, 0, 0, 0);
 
     let invalid = false;
 
@@ -1115,8 +1145,8 @@ function validateReturnDate() {
     let returnDate = new Date(dateReturnElement.value);
     let pickupDate = new Date(datePickupElement.value);
 
-    returnDate.setHours(0,0,0,0);
-    pickupDate.setHours(0,0,0,0);
+    returnDate.setHours(0, 0, 0, 0);
+    pickupDate.setHours(0, 0, 0, 0);
 
     if (returnDate < pickupDate) {
         setInvalid(dateReturnElement);

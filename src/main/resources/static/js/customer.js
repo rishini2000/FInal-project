@@ -142,15 +142,32 @@ textMobileElement.addEventListener("keyup", () => {
 });
 
 textEmailElement.addEventListener("keyup", () => {
-    let email = textEmailElement.value;
-    let regPattern = new RegExp("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
-    if (regPattern.test(email)) {
-        setValid(textEmailElement);
-        customer.email = email;
-    } else {
-        setInvalid(textEmailElement);
+
+    let email = textEmailElement.value.trim();
+
+    // Email is optional
+    if (email == "") {
+
         customer.email = null;
+        clearValidation(textEmailElement);
+
+        return;
     }
+
+    let regPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    if (regPattern.test(email)) {
+
+        customer.email = email;
+        setValid(textEmailElement);
+
+    } else {
+
+        customer.email = null;
+        setInvalid(textEmailElement);
+
+    }
+
 });
 
 textAddressElement.addEventListener("keyup", () => {
@@ -175,13 +192,23 @@ textNotesElement.addEventListener("keyup", () => {
 
 
 const checkFormError = () => {
+
     let errors = "";
-    if (customer.firstname == null) errors += "First name is required\n";
-    if (customer.lastname == null) errors += "Last name is required\n";
-    if (customer.mobile == null) errors += "Mobile is required\n";
-    if (customer.email == null) errors += "Email is required\n";
-    if (customer.address == null) errors += "Address is required\n";
+
+    if (customer.firstname == null)
+        errors += "First name is required\n";
+
+    if (customer.lastname == null)
+        errors += "Last name is required\n";
+
+    if (customer.mobile == null)
+        errors += "Mobile is required\n";
+
+    if (customer.address == null)
+        errors += "Address is required\n";
+
     return errors;
+
 };
 
 

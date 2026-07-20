@@ -40,6 +40,5 @@ public class RentalHasItem {
     private Boolean alteration_required;
     private String alteration_note;
     private BigDecimal item_price;
-    private Integer quantity;
     private Boolean is_pickup;
 }

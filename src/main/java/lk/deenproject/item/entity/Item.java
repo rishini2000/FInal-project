@@ -59,4 +59,7 @@ public class Item {
 
     @Column(name = "rental_price")
     private BigDecimal rental_price;
+
+    @Column(name = "key_money")
+    private BigDecimal key_money;
 }

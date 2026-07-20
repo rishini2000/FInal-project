@@ -27,19 +27,23 @@ public class Customer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id ;
+    private Integer id;
 
     private String customercode;
 
-    @NotBlank @Size(min=1, max=50)
+    @NotBlank
+    @Size(min = 1, max = 50)
     private String firstname;
-    @NotBlank @Size(min=1, max=50)
+    @NotBlank
+    @Size(min = 1, max = 50)
     private String lastname;
     private String mobile;
-    @NotBlank @Email
-    private String email;
+    @NotBlank
     private String address;
     private String note;
+
+    @Email
+    private String email;
 
     private LocalDateTime addeddatetime;
     private LocalDateTime updateddatetime;

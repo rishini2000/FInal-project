@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import lk.deenproject.common.BaseController;
+import lk.deenproject.enums.ServicePackageStatus;
 import lk.deenproject.service_package.entity.ServicePackage;
 import lk.deenproject.service_package.repository.ServicePackageRepository;
 
@@ -61,9 +62,19 @@ public class ServicePackageController extends BaseController<ServicePackage, Int
         }
 
         try {
+
             servicePackage.setAddeddatetime(LocalDateTime.now());
+
+            if (servicePackage.getServicePackageHasServiceList() != null) {
+                for (var item : servicePackage.getServicePackageHasServiceList()) {
+                    item.setService_package_id(servicePackage);
+                }
+            }
+
             servicePackageDao.save(servicePackage);
+
             return success();
+
         } catch (Exception e) {
             return error("save", e.getMessage());
         }
@@ -79,6 +90,13 @@ public class ServicePackageController extends BaseController<ServicePackage, Int
 
         try {
             servicePackage.setUpdateddatetime(LocalDateTime.now());
+
+            if (servicePackage.getServicePackageHasServiceList() != null) {
+                for (var item : servicePackage.getServicePackageHasServiceList()) {
+                    item.setService_package_id(servicePackage);
+                }
+            }
+
             servicePackageDao.save(servicePackage);
             return success();
         } catch (Exception e) {
@@ -94,12 +112,18 @@ public class ServicePackageController extends BaseController<ServicePackage, Int
             return error("delete", "Service Package not found.");
         }
 
-        try {
-            servicePackage.setDeletedatetime(LocalDateTime.now());
-            servicePackageDao.delete(existingPackage);
-            return success();
-        } catch (Exception e) {
-            return error("delete", e.getMessage());
-        }
+try {
+
+    existingPackage.setServicePackageStatus(ServicePackageStatus.INACTIVE);
+
+    existingPackage.setDeletedatetime(LocalDateTime.now());
+
+    servicePackageDao.save(existingPackage);
+
+    return success();
+
+} catch (Exception e) {
+    return error("delete", e.getMessage());
+}
     }
 }
