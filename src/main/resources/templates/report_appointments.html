@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{header :: headerFragment}"></head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar d-none d-lg-flex" th:replace="~{layout :: sidebarFragment}"></aside>
+        <div th:replace="~{layout :: sidebarOffcanvasFragment}"></div>
+        <div class="main-content">
+            <header th:replace="~{layout :: topbarFragment('Appointment Report')}"></header>
+            <div class="content-wrapper">
+                <div class="card mb-3">
+                    <div class="card-header title">
+                        <div class="row align-items-center">
+                            <div class="col text-start">
+                                <h2 class="table-title"><i class="fa-solid fa-calendar-check me-2"></i>Appointment Report</h2>
+                            </div>
+                            <div class="col text-end header-actions">
+                                <button type="button" class="btn btn-outline-secondary" onclick="printReport()"><i class="fa-solid fa-print me-1"></i>Print</button>
+                                <button type="button" class="btn btn-outline-success" onclick="exportCSV()"><i class="fa-solid fa-download me-1"></i>Export CSV</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary Cards -->
+                <div class="row mb-3">
+                    <div class="col-md-3"><div class="card"><div class="card-body text-center"><h6 class="text-muted">Total Appointments</h6><h3 id="totalAppointments">0</h3></div></div></div>
+                    <div class="col-md-3"><div class="card"><div class="card-body text-center"><h6 class="text-muted">Completed</h6><h3 id="completedCount">0</h3></div></div></div>
+                    <div class="col-md-3"><div class="card"><div class="card-body text-center"><h6 class="text-muted">Cancelled</h6><h3 id="cancelledCount">0</h3></div></div></div>
+                    <div class="col-md-3"><div class="card"><div class="card-body text-center"><h6 class="text-muted">Total Revenue</h6><h3 id="totalApptRevenue">Rs. 0</h3></div></div></div>
+                </div>
+
+                <!-- Filters -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">From Date</label>
+                                <input type="date" id="filterDateFrom" class="form-control" onchange="applyFilters()">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">To Date</label>
+                                <input type="date" id="filterDateTo" class="form-control" onchange="applyFilters()">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label fw-bold">Status</label>
+                                <select id="filterStatus" class="form-select" onchange="applyFilters()">
+                                    <option value="">All</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label fw-bold">Booking Method</label>
+                                <select id="filterMethod" class="form-select" onchange="applyFilters()">
+                                    <option value="">All</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="button" class="btn btn-secondary w-100" onclick="clearFilters()">Clear</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Table -->
+                <div class="row m-2">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <table class="modern-table">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Appt No</th>
+                                            <th>Date</th>
+                                            <th>Employee</th>
+                                            <th>Duration</th>
+                                            <th>Price (Rs.)</th>
+                                            <th>Status</th>
+                                            <th>Method</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tableBodyAppointments" class="tablebody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div th:replace="~{footer :: footerFragment}"></div>
+    <script src="/js/report_appointments.js"></script>
+</body>
+</html>

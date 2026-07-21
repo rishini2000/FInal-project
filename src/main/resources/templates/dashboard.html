@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{header :: headerFragment}"></head>
+
+<body>
+    <div class="app-layout">
+        <!-- Desktop Sidebar -->
+        <aside class="sidebar d-none d-lg-flex" th:replace="~{layout :: sidebarFragment}"></aside>
+
+        <!-- Mobile Offcanvas Sidebar -->
+        <div th:replace="~{layout :: sidebarOffcanvasFragment}"></div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <header th:replace="~{layout :: topbarFragment('Dashboard')}"></header>
+
+            <!-- Page Content -->
+            <div class="content-wrapper">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body text-center py-5">
+                                <div style="width: 64px; height: 64px; background: linear-gradient(135deg, var(--primary), var(--accent)); border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+                                    <i class="fa-solid fa-gauge-high" style="color: #fff; font-size: 1.5rem;"></i>
+                                </div>
+                                <h3 style="font-family: var(--font-heading); font-weight: 700; margin-bottom: 0.5rem;">Dashboard</h3>
+                                <p class="text-secondary mb-4">Welcome to the Salon DEEN management dashboard. Use the sidebar to navigate between modules.</p>
+                                <a href="/" class="btn btn-sm btn-outline-primary">
+                                    <i class="fa-solid fa-house me-1"></i> Go to Home
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{footer :: footerFragment}"></div>
+</body>
+
+</html>

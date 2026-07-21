@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{header :: headerFragment}">
+    <meta charset="utf-8">
+</head>
+
+<body>
+    <div class="app-layout">
+        <!-- Desktop Sidebar -->
+        <aside class="sidebar d-none d-lg-flex" th:replace="~{layout :: sidebarFragment}"></aside>
+
+        <!-- Mobile Offcanvas Sidebar -->
+        <div th:replace="~{layout :: sidebarOffcanvasFragment}"></div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <header th:replace="~{layout :: topbarFragment('Rental Management')}"></header>
+
+            <!-- Page Content -->
+            <div class="content-wrapper">
+                <!-- Page Title Card with Add Button -->
+                <div class="card mb-3">
+                    <div class="card-header title">
+                        <div class="row align-items-center">
+                            <div class="col text-start">
+                                <h2 class="table-title">Rental Management</h2>
+                            </div>
+                            <div class="col text-end header-actions" sec:authorize="hasAuthority('RENTAL_INSERT')">
+                                 <button type="button" class="btn my-custom-employee-button" data-bs-toggle="offcanvas"
+                                     data-bs-target="#panelRentalForm">
+                                     <i class="fa-solid fa-plus"></i> Add New Rental
+                                 </button>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="offcanvas offcanvas-end offcanvas-panel" id="panelRentalForm" data-bs-backdrop="true">
+                    <div class="offcanvas-header">
+                        <h5 class="offcanvas-title">New Rental</h5>
+                        <button class="btn-close" data-bs-dismiss="offcanvas"></button>
+                    </div>
+                    <div class="offcanvas-body">
+                        <form id="formRental" onsubmit="return false;">
+                            <!-- Section: Rental Details -->
+                            <h6 class="form-section-title"><i class="fa-solid fa-shirt me-2"></i>Rental Details</h6>
+                            <div class="row g-3">
+
+                                <div class="col-md-6">
+                                    <label for="searchCustomer" class="form-label fw-bold">Customer <span
+                                            class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i
+                                                class="fa-solid fa-magnifying-glass"></i></span>
+                                        <input type="text" id="searchCustomer" class="form-control"
+                                            placeholder="Search customer..." list="listCustomer">
+                                        <datalist id="listCustomer"></datalist>
+                                        <input type="hidden" id="selectCustomerId">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="dateAppointment" class="form-label fw-bold">
+                                        Appointment Date <span class="text-danger">*</span>
+                                    </label>
+
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="fa-solid fa-calendar-days"></i>
+                                        </span>
+
+                                        <input type="date" id="dateAppointment" class="form-control input-element"
+                                            required>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="dateFunction" class="form-label fw-bold">Function Date <span
+                                            class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-solid fa-calendar-days"></i></span>
+                                        <input type="date" id="dateFunction" required
+                                            class="form-control input-element" />
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="dateFitton" class="form-label fw-bold">Fitton Date <span
+                                            class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-solid fa-calendar-days"></i></span>
+                                        <input type="date" id="dateFitton" required
+                                            class="form-control input-element" />
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="datePickup" class="form-label fw-bold">Pickup Date <span
+                                            class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-solid fa-calendar-days"></i></span>
+                                        <input type="date" id="datePickup" required
+                                            class="form-control input-element" />
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="dateReturn" class="form-label fw-bold">Return Date <span
+                                            class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-solid fa-calendar-days"></i></span>
+                                        <input type="date" id="dateReturn" required
+                                            class="form-control input-element" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section: Financial -->
+                            <hr class="form-section-divider">
+                            <h6 class="form-section-title"><i class="fa-solid fa-coins me-2"></i>Financial</h6>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="textKeyMoney" class="form-label fw-bold">Total Key Money <span
+                                            class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text currency">Rs.</span>
+                                        <input type="number" id="textKeyMoney" class="form-control input-element"
+                                            step="0.01" min="0" readonly>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label for="textTotalCharge" class="form-label fw-bold">Total Charge <span
+                                            class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text currency">Rs.</span>
+                                        <input type="number" id="textTotalCharge" class="form-control input-element"
+                                            step="0.01" min="0" readonly>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label for="textAdvance" class="form-label fw-bold">Advance <span
+                                            class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text currency">Rs.</span>
+                                        <input type="number" id="textAdvance" required placeholder="0.00"
+                                            class="form-control input-element" step="0.01" min="0">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label for="selectStatus" class="form-label fw-bold">Status <span
+                                            class="text-danger">*</span></label>
+                                    <select id="selectStatus" class="form-select input-element" required>
+                                        <option value="" selected disabled>-- Select Status --</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-12">
+                                    <label for="textNotes" class="form-label fw-bold">Notes</label>
+                                    <textarea id="textNotes" placeholder="Optional notes"
+                                        class="form-control input-element" rows="3"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Section: Rental Items -->
+                            <hr class="form-section-divider">
+                            <div class="inner-section-header">
+                                <h6><i class="fa-solid fa-box-open me-2"></i>Rental Items</h6>
+                                <button type="button" class="btn btn-sm btn-primary" onclick="addSelectedItem()"><i
+                                        class="fa-solid fa-plus me-1"></i>Add Item</button>
+                            </div>
+                            <div class="inner-table-container">
+                                <div class="inner-controls">
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-md-4">
+                                            <label for="selectItemCategory" class="form-label fw-bold">Item
+                                                Category</label>
+                                            <select id="selectItemCategory" class="form-select">
+                                                <option value="" selected disabled>-- Select Category --</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="searchItem" class="form-label fw-bold">Item</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i
+                                                        class="fa-solid fa-magnifying-glass"></i></span>
+                                                <input type="text" id="searchItem" class="form-control"
+                                                    placeholder="Search item..." list="listItem">
+                                                <datalist id="listItem"></datalist>
+                                                <input type="hidden" id="selectItem">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="switchAlterationRequired" class="form-label fw-bold">Alteration
+                                                Required</label>
+                                            <div class="form-check form-switch mt-2">
+                                                <input class="form-check-input" type="checkbox"
+                                                    id="switchAlterationRequired">
+                                                <label class="form-check-label"
+                                                    for="switchAlterationRequired">Yes</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="textAlterationNote" class="form-label fw-bold">Alteration
+                                                Note</label>
+                                            <input type="text" id="textAlterationNote"
+                                                placeholder="Enter alteration details (if any)" class="form-control"
+                                                disabled>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="textItemPrice" class="form-label fw-bold">Item Price</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text currency">Rs.</span>
+                                                <input type="number" id="textItemPrice" class="form-control" readonly>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="textItemKeyMoney" class="form-label fw-bold">Item Key
+                                                Money</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text currency">Rs.</span>
+                                                <input type="number" id="textItemKeyMoney" class="form-control"
+                                                    readonly>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <table class="modern-table">
+                                    <thead class="table-secondary">
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Item Code</th>
+                                            <th>Item Name</th>
+                                            <th>Price (Rs.)</th>
+                                            <th>Key Money (Rs.)</th>
+                                            <th>Alteration</th>
+                                            <th>Alteration Note</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tableBodySelectedItemsInnerForm">
+                                        <!-- Selected items will be populated here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </form>
+
+                        <div class="panel-footer">
+                            <button type="button" id="buttonClear" class="btn-clear"
+                                onclick="refreshRentalForm()">Clear</button>
+                            <button type="button" id="buttonUpdate" class="btn-update" style="display:none;"
+                                onclick="buttonRentalUpdate();">Update</button>
+                            <button type="button" id="buttonSubmit" class="btn-submit"
+                                onclick="submitRentalForm();">Submit</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- start table area -->
+                <div class="row m-2">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <table class="modern-table">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Customer</th>
+                                            <th>Appointment Date</th>
+                                            <th>Function Date</th>
+                                            <th>Fitton Date</th>
+                                            <th>Pickup Date</th>
+                                            <th>Return Date</th>
+                                            <th>Key Money</th>
+                                            <th>Status</th>
+                                            <th>Total Charge</th>
+                                            <th>Advance</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tableBodyRental" class="tablebody">
+                                        <!-- Table rows will be populated dynamically by rental.js -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end table area -->
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{footer :: footerFragment}"></div>
+    <script src="/js/rental.js"></script>
+</body>
+
+</html>

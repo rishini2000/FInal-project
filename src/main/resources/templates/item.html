@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{header :: headerFragment}">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+    <div class="app-layout">
+        <!-- Desktop Sidebar -->
+        <aside class="sidebar d-none d-lg-flex" th:replace="~{layout :: sidebarFragment}"></aside>
+
+        <!-- Mobile Offcanvas Sidebar -->
+        <div th:replace="~{layout :: sidebarOffcanvasFragment}"></div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <header th:replace="~{layout :: topbarFragment('Item Management')}"></header>
+
+            <!-- Page Content -->
+            <div class="content-wrapper">
+                <!-- Page Title Card with Add Button -->
+                <div class="card mb-3">
+                    <div class="card-header title">
+                        <div class="row align-items-center">
+                            <div class="col text-start">
+                                <h2 class="table-title">Item Management</h2>
+                            </div>
+                            <div class="col text-end header-actions" sec:authorize="hasAuthority('ITEM_INSERT')">
+                                 <button type="button" class="btn my-custom-employee-button" data-bs-toggle="offcanvas"
+                                     data-bs-target="#panelItemForm">
+                                     <i class="fa-solid fa-plus"></i> Add New Item
+                                 </button>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row m-2">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <table class="modern-table">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Item ID</th>
+                                            <th>Category</th>
+                                            <th>Item Name</th>
+                                            <th>Size</th>
+                                            <th>Status</th>
+                                            <th>Notes</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tableBodyItem" class="tablebody">
+                                        <!-- Table rows will be populated dynamically by item.js -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="offcanvas offcanvas-end offcanvas-panel" id="panelItemForm" data-bs-backdrop="true">
+                    <div class="offcanvas-header">
+                        <h5 class="offcanvas-title">New Item</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+                    </div>
+                    <div class="offcanvas-body">
+                        <form id="formItem" onsubmit="return false;">
+
+                            <!-- Auto-generated code (edit only) -->
+                            <div class="code-display mb-3" id="itemCodeDisplay" style="display:none;">
+                                <span class="code-label">Item Code</span>
+                                <span id="itemCodeValue"></span>
+                            </div>
+
+                            <h6 class="form-section-title"><i class="fa-solid fa-boxes-stacked me-2"></i>Item Details
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="selectCategory" class="form-label"><i
+                                            class="fa-solid fa-tag me-1"></i>Category <span
+                                            class="text-danger">*</span></label>
+                                    <select id="selectCategory" class="form-select input-element" required>
+                                        <option value="" selected disabled>-- Select Category --</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="textItemName" class="form-label"><i
+                                            class="fa-solid fa-box me-1"></i>Item Name <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" id="textItemName" required placeholder="Enter item name"
+                                        class="form-control input-element">
+                                    <div class="invalid-feedback">Please enter a valid item name (min 2 characters).
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="selectSize" class="form-label"><i
+                                            class="fa-solid fa-ruler me-1"></i>Size <span
+                                            class="text-danger">*</span></label>
+                                    <select id="selectSize" class="form-select input-element" required>
+                                        <option value="" selected disabled>-- Select Size --</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="selectStatus" class="form-label"><i
+                                            class="fa-solid fa-toggle-on me-1"></i>Status <span
+                                            class="text-danger">*</span></label>
+                                    <select id="selectStatus" class="form-select input-element" required>
+                                        <option value="" selected disabled>-- Select Status --</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="textRentalPrice" class="form-label">
+                                        <i class="fa-solid fa-money-bill me-1"></i>
+                                        Rental Price <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="number" id="textRentalPrice" class="form-control input-element"
+                                        placeholder="Enter rental price">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="textKeyMoney" class="form-label">
+                                        <i class="fa-solid fa-money-bill me-1"></i>
+                                        Key Money <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="number" id="textKeyMoney" class="form-control input-element"
+                                        placeholder="Enter key money">
+                                </div>
+                            </div>
+
+                            <hr class="form-section-divider">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label for="textNotes" class="form-label"><i
+                                            class="fa-solid fa-sticky-note me-1"></i>Notes</label>
+                                    <textarea id="textNotes" placeholder="Optional notes"
+                                        class="form-control input-element" rows="2"></textarea>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="panel-footer">
+                            <button type="button" id="buttonClear" class="btn-clear"
+                                onclick="refreshItemForm()">Clear</button>
+                            <button type="button" id="buttonUpdate" class="btn-update" style="display:none;"
+                                onclick="updateItemForm()">Update</button>
+                            <button type="button" id="buttonSubmit" class="btn-submit"
+                                onclick="submitItemForm()">Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{footer :: footerFragment}"></div>
+    <script src="/js/item.js"></script>
+</body>
+
+</html>

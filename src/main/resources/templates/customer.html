@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{header :: headerFragment}"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head>
+
+<body>
+    <div class="app-layout">
+        <!-- Desktop Sidebar -->
+        <aside class="sidebar d-none d-lg-flex" th:replace="~{layout :: sidebarFragment}"></aside>
+
+        <!-- Mobile Offcanvas Sidebar -->
+        <div th:replace="~{layout :: sidebarOffcanvasFragment}"></div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <header th:replace="~{layout :: topbarFragment('Customer Management')}"></header>
+
+            <!-- Page Content -->
+            <div class="content-wrapper">
+                <!-- Page Title Card with Add Button -->
+                <div class="card mb-3">
+                    <div class="card-header title">
+                        <div class="row align-items-center">
+                            <div class="col text-start">
+                                <h2 class="table-title">Customer Management</h2>
+                            </div>
+                            <div class="col text-end header-actions" sec:authorize="hasAuthority('CUSTOMER_INSERT')">
+                                <button type="button" class="btn my-custom-employee-button" data-bs-toggle="offcanvas"
+                                    data-bs-target="#panelCustomerForm">
+                                    <i class="fa-solid fa-plus"></i> Add New Customer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customer Form Modal -->
+                <div class="offcanvas offcanvas-end offcanvas-panel" id="panelCustomerForm" data-bs-backdrop="true">
+                    <div class="offcanvas-header">
+                        <h5 class="offcanvas-title">New Customer</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+                    </div>
+                    <div class="offcanvas-body">
+                        <form id="formCustomer" onsubmit="return false;">
+
+                            <!-- Auto-generated code (edit only) -->
+                            <div class="code-display mb-3" id="customerCodeDisplay" style="display:none;">
+                                <span class="code-label">Customer Code</span>
+                                <span id="customerCodeValue"></span>
+                            </div>
+
+                            <h6 class="form-section-title"><i class="fa-solid fa-user me-2"></i>Personal Details</h6>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="textFirstname" class="form-label"><i class="fa-solid fa-user me-1"></i>First Name <span class="text-danger">*</span></label>
+                                    <input type="text" id="textFirstname" required placeholder="Enter first name" class="form-control input-element">
+                                    <div class="invalid-feedback">Please enter a valid first name (min 2 characters).</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="textLastname" class="form-label"><i class="fa-solid fa-user me-1"></i>Last Name <span class="text-danger">*</span></label>
+                                    <input type="text" id="textLastname" required placeholder="Enter last name" class="form-control input-element">
+                                    <div class="invalid-feedback">Please enter a valid last name (min 2 characters).</div>
+                                </div>
+                            </div>
+
+                            <hr class="form-section-divider">
+                            <h6 class="form-section-title"><i class="fa-solid fa-address-book me-2"></i>Contact Information</h6>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="textMobile" class="form-label"><i class="fa-solid fa-phone me-1"></i>Mobile <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
+                                        <input type="text" id="textMobile" required placeholder="0712345678" class="form-control input-element">
+                                    </div>
+                                    <div class="invalid-feedback">Please enter a valid mobile number.</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="textEmail" class="form-label"><i class="fa-solid fa-envelope me-1"></i>Email <span class="text-danger"></span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">@</span>
+                                        <input type="email" id="textEmail" required placeholder="email@example.com" class="form-control input-element">
+                                    </div>
+                                    <div class="invalid-feedback">Please enter a valid email address.</div>
+                                </div>
+                            </div>
+
+                            <hr class="form-section-divider">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label for="textAddress" class="form-label"><i class="fa-solid fa-location-dot me-1"></i>Address <span class="text-danger">*</span></label>
+                                    <textarea id="textAddress" required placeholder="Enter address" class="form-control input-element" rows="2"></textarea>
+                                </div>
+                                <div class="col-12">
+                                    <label for="textNotes" class="form-label"><i class="fa-solid fa-sticky-note me-1"></i>Notes</label>
+                                    <textarea id="textNotes" placeholder="Optional notes" class="form-control input-element" rows="2"></textarea>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="panel-footer">
+                            <button type="button" id="buttonClear" class="btn-clear" onclick="refreshCustomerForm()">Clear</button>
+                            <button type="button" id="buttonUpdate" class="btn-update" style="display:none;" onclick="updateCustomerForm()">Update</button>
+                            <button type="button" id="buttonSubmit" class="btn-submit" onclick="submitCustomerForm()">Submit</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customer Table -->
+                <div class="card">
+                    <div class="card-body">
+                        <table class="modern-table">
+                            <thead>
+                                <tr>
+                                    <th class="col-center">#</th>
+                                    <th class="col-text">Customer</th>
+                                    <th class="col-text">Email</th>
+                                    <th class="col-text">Contact</th>
+                                    <th class="col-text">Address</th>
+                                    <th class="col-text">Notes</th>
+                                    <th class="col-actions">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBodyCustomer">
+                                <!-- Data loaded via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{footer :: footerFragment}"></div>
+    <script src="/js/customer.js"></script>
+</body>
+
+</html>

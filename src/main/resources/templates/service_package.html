@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{header :: headerFragment}"></head>
+
+<body>
+    <div class="app-layout">
+        <aside class="sidebar d-none d-lg-flex" th:replace="~{layout :: sidebarFragment}"></aside>
+        <div th:replace="~{layout :: sidebarOffcanvasFragment}"></div>
+
+        <div class="main-content">
+            <header th:replace="~{layout :: topbarFragment('Service Package Management')}"></header>
+
+            <div class="content-wrapper">
+                <div class="card mb-3">
+                    <div class="card-header title">
+                        <div class="row align-items-center">
+                            <div class="col text-start">
+                                <h2 class="table-title">Service Package Management</h2>
+                            </div>
+                            <div class="col text-end header-actions" sec:authorize="hasAuthority('SERVICE_PACKAGE_INSERT')">
+                                 <button type="button" class="btn my-custom-employee-button" data-bs-toggle="offcanvas"
+                                     data-bs-target="#panelServicePackageForm">
+                                     <i class="fa-solid fa-plus"></i> Add New Service Package
+                                 </button>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <table class="modern-table">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Name</th>
+                                            <th>Default Price (Rs.)</th>
+                                            <th>Duration (min)</th>
+                                            <th>Package Status</th>
+                                            <th>Services</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tableBodyServicePackage" class="tablebody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="offcanvas offcanvas-end offcanvas-panel" id="panelServicePackageForm" data-bs-backdrop="true">
+                    <div class="offcanvas-header">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <h5 class="offcanvas-title mb-0">New Service Package</h5>
+                                <small id="formHeaderSubtitle" class="text-muted">Fill package details below</small>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+                    </div>
+
+                    <div class="offcanvas-body">
+                        <form id="formServicePackage" onsubmit="return false;">
+                            <!-- Section: Package Details -->
+                            <h6 class="form-section-title"><i class="fa-solid fa-box me-2"></i>Package Details</h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="textPackageName" class="form-label fw-bold">Package Name <span class="text-danger">*</span></label>
+                                    <input id="textPackageName" type="text" class="form-control input-element" required placeholder="Enter package name" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="textDuration" class="form-label fw-bold">Duration (min)</label>
+                                    <div class="input-group">
+                                        <input id="textDuration" type="text" class="form-control input-element readonly-calculated" readonly placeholder="Auto-calculated" />
+                                        <span class="input-group-text">min</span>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <label for="textNotes" class="form-label fw-bold">Notes</label>
+                                    <textarea id="textNotes" class="form-control input-element" placeholder="Optional notes" rows="2"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Section: Services -->
+                            <hr class="form-section-divider">
+                            <div class="inner-section-header">
+                                <h6><i class="fa-solid fa-scissors me-2"></i>Services</h6>
+                                <button type="button" class="btn btn-sm btn-primary" onclick="addServiceToList()"><i class="fa-solid fa-plus me-1"></i>Add Service</button>
+                            </div>
+                            <div class="inner-table-container">
+                                <div class="inner-controls">
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-md-4">
+                                            <label for="selectServiceCategory" class="form-label fw-bold">Service Category</label>
+                                            <select id="selectServiceCategory" class="form-select">
+                                                <option value="" selected disabled>-- Select Category --</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="searchServiceItem" class="form-label fw-bold">Service</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
+                                                <input type="text" id="searchServiceItem" class="form-control" placeholder="Search service..." list="listServiceItem">
+                                                <datalist id="listServiceItem"></datalist>
+                                                <input type="hidden" id="selectServiceItem">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-bold">&nbsp;</label>
+                                            <button type="button" class="btn btn-success d-block w-100" onclick="addServiceToList()">
+                                                <i class="fa-solid fa-plus me-1"></i> Add
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <table class="modern-table">
+                                    <thead class="table-secondary">
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Service Category</th>
+                                            <th>Service Name</th>
+                                            <th>Duration</th>
+                                            <th>Price (Rs.)</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tableBodySelectedServicesInnerForm" class="tablebody">
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Section: Pricing -->
+                            <hr class="form-section-divider">
+                            <h6 class="form-section-title"><i class="fa-solid fa-coins me-2"></i>Pricing</h6>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="textDefaultPrice" class="form-label fw-bold">Default Price (Rs.) <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">Rs.</span>
+                                        <input id="textDefaultPrice" type="number" min="0" step="0.01" class="form-control input-element" required placeholder="0.00" />
+                                    </div>
+                                </div>
+                                <div class="col-md-8 d-flex align-items-end">
+                                    <div id="discountDisplay" class="text-muted small pb-2" style="display:none;">
+                                        <span id="totalServiceValue"></span> &nbsp;|&nbsp; <span id="discountAmount" class="text-success fw-bold"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section: Status -->
+                            <hr class="form-section-divider">
+                            <h6 class="form-section-title"><i class="fa-solid fa-toggle-on me-2"></i>Status</h6>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="selectPackageStatus" class="form-label fw-bold">Package Status <span class="text-danger">*</span></label>
+                                    <select id="selectPackageStatus" class="form-select input-element" required>
+                                        <option value="" selected disabled>-- Select Status --</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Section: Promotional Pricing -->
+                            <hr class="form-section-divider">
+                            <div class="inner-section-header">
+                                <h6><i class="fa-solid fa-badge-percent me-2"></i>Promotional Pricing</h6>
+                                <button type="button" class="btn btn-sm btn-primary" onclick="addPromoPrice()"><i class="fa-solid fa-plus me-1"></i>Add Promo Price</button>
+                            </div>
+                            <div class="inner-table-container">
+                                <div class="inner-controls">
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-md-4">
+                                            <label for="textPromoPrice" class="form-label fw-bold">Promo Price (Rs.)</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">Rs.</span>
+                                                <input type="number" min="0" step="0.01" id="textPromoPrice" class="form-control" placeholder="0.00">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label for="datePromoStart" class="form-label fw-bold">Start Date</label>
+                                            <input type="date" id="datePromoStart" class="form-control">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label for="datePromoEnd" class="form-label fw-bold">End Date</label>
+                                            <input type="date" id="datePromoEnd" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <table class="modern-table">
+                                    <thead class="table-secondary">
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Price (Rs.)</th>
+                                            <th>Start Date</th>
+                                            <th>End Date</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tableBodyPromoPrices" class="tablebody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </form>
+
+                        <div class="panel-footer">
+                            <button type="button" id="buttonClear" class="btn-clear"
+                                onclick="refreshServicePackageForm()">Clear</button>
+                            <button type="button" id="buttonUpdate" class="btn-update"
+                                onclick="updateServicePackageForm();">Update</button>
+                            <button type="button" id="buttonSubmit" class="btn-submit"
+                                onclick="submitServicePackageForm();">Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{footer :: footerFragment}"></div>
+    <script src="/js/service_package.js"></script>
+</body>
+</html>

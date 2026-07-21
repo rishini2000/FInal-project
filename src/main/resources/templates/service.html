@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{header :: headerFragment}"></head>
+
+<body>
+    <div class="app-layout">
+        <!-- Desktop Sidebar -->
+        <aside class="sidebar d-none d-lg-flex" th:replace="~{layout :: sidebarFragment}"></aside>
+
+        <!-- Mobile Offcanvas Sidebar -->
+        <div th:replace="~{layout :: sidebarOffcanvasFragment}"></div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <header th:replace="~{layout :: topbarFragment('Service Management')}"></header>
+
+            <!-- Page Content -->
+            <div class="content-wrapper">
+                <!-- Page Title Card with Add Button -->
+                <div class="card mb-3">
+                    <div class="card-header title">
+                        <div class="row align-items-center">
+                            <div class="col text-start">
+                                <h2 class="table-title">Service Management</h2>
+                            </div>
+                            <div class="col text-end header-actions" sec:authorize="hasAuthority('SERVICE_INSERT')">
+                                 <button type="button" class="btn my-custom-employee-button" data-bs-toggle="offcanvas"
+                                     data-bs-target="#panelServiceForm">
+                                     <i class="fa-solid fa-plus"></i> Add New Service
+                                 </button>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="offcanvas offcanvas-end offcanvas-panel" id="panelServiceForm" data-bs-backdrop="true">
+                    <div class="offcanvas-header">
+                        <h5 class="offcanvas-title">New Service</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+                    </div>
+                    <div class="offcanvas-body">
+                        <form id="formService" onsubmit="return false;">
+
+                            <!-- Auto-generated code (edit only) -->
+                            <div class="code-display mb-3" id="serviceCodeDisplay" style="display:none;">
+                                <span class="code-label">Service Code</span>
+                                <span id="serviceCodeValue"></span>
+                            </div>
+
+                            <h6 class="form-section-title"><i class="fa-solid fa-hand-sparkles me-2"></i>Service Details</h6>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="textServiceName" class="form-label"><i class="fa-solid fa-tag me-1"></i>Name <span class="text-danger">*</span></label>
+                                    <input type="text" id="textServiceName" required placeholder="Enter service name" class="form-control input-element">
+                                    <div class="invalid-feedback">Please enter a valid service name.</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="selectCategory" id="lblselectCategory" class="form-label"><i class="fa-solid fa-list me-1"></i>Category <span class="text-danger">*</span></label>
+                                    <select id="selectCategory" required class="form-select input-element">
+                                        <option value="" selected disabled>-- Select Category --</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="textDurationMinutes" class="form-label"><i class="fa-solid fa-clock me-1"></i>Duration <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <input type="number" min="1" id="textDurationMinutes" required placeholder="e.g. 60" class="form-control input-element">
+                                        <span class="input-group-text">min</span>
+                                    </div>
+                                    <div class="invalid-feedback">Please enter a valid duration.</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="selectStatus" id="lblselectStatus" class="form-label"><i class="fa-solid fa-toggle-on me-1"></i>Status <span class="text-danger">*</span></label>
+                                    <select id="selectStatus" class="form-select input-element" required>
+                                        <option value="" selected disabled>-- Select Status --</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="textPrice" class="form-label"><i class="fa-solid fa-coins me-1"></i>Price (Rs.) <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">Rs.</span>
+                                        <input type="number" min="0" step="0.01" id="textPrice" required placeholder="0.00" class="form-control input-element">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="form-section-divider">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label for="textDescription" class="form-label"><i class="fa-solid fa-align-left me-1"></i>Description</label>
+                                    <textarea id="textDescription" placeholder="Optional description" class="form-control input-element" rows="2"></textarea>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="panel-footer">
+                            <button type="button" id="buttonClear" class="btn-clear" onclick="refreshServiceForm()">Clear</button>
+                            <button type="button" id="buttonUpdate" class="btn-update" style="display:none;" onclick="updateServiceForm()">Update</button>
+                            <button type="button" id="buttonSubmit" class="btn-submit" onclick="submitServiceForm()">Submit</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- start table area -->
+                <div class="row m-2">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <table class="modern-table">
+                                    <thead>
+                                        <tr>
+                                            <th> # </th>
+                                            <th> Name </th>
+                                            <th> Category </th>
+                                            <th> Duration (min) </th>
+                                            <th> Price (Rs.) </th>
+                                            <th> Status </th>
+                                            <th> Action </th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody id="tableBodyService" class="tablebody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end table area -->
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{footer :: footerFragment}"></div>
+    <script src="/js/service.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{header :: headerFragment}"></head>
+
+<body>
+    <div class="app-layout">
+        <!-- Desktop Sidebar -->
+        <aside class="sidebar d-none d-lg-flex" th:replace="~{layout :: sidebarFragment}"></aside>
+
+        <!-- Mobile Offcanvas Sidebar -->
+        <div th:replace="~{layout :: sidebarOffcanvasFragment}"></div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <header th:replace="~{layout :: topbarFragment('Handover Management')}"></header>
+
+            <!-- Page Content -->
+            <div class="content-wrapper">
+                <!-- Page Title Card with Add Button -->
+                <div class="card mb-3">
+                    <div class="card-header title">
+                        <div class="row align-items-center">
+                            <div class="col text-start">
+                                <h2 class="table-title">Handover Management</h2>
+                            </div>
+                            <div class="col text-end header-actions" sec:authorize="hasAuthority('HANDOVER_INSERT')">
+                                 <button type="button" class="btn my-custom-employee-button" data-bs-toggle="offcanvas"
+                                     data-bs-target="#panelHandoverForm">
+                                     <i class="fa-solid fa-plus"></i> Add New Handover
+                                 </button>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="offcanvas offcanvas-end offcanvas-panel" id="panelHandoverForm" data-bs-backdrop="true">
+                    <div class="offcanvas-header">
+                        <h5 class="offcanvas-title">New Handover</h5>
+                        <button class="btn-close" data-bs-dismiss="offcanvas"></button>
+                    </div>
+                    <div class="offcanvas-body">
+                        <form id="formHandOver" onsubmit="return false;">
+                            <!-- Section: Return Details -->
+                            <h6 class="form-section-title"><i class="fa-solid fa-rotate-left me-2"></i>Return Details
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                        <label for="searchCustomer" class="form-label fw-bold">
+                                        Customer <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="fa-solid fa-user"></i>
+                                        </span>
+                                        <input type="text" id="searchCustomer" class="form-control"
+                                            placeholder="Search customer..." list="listCustomer">
+                                        <input type="hidden" id="selectCustomer">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="searchRental" class="form-label fw-bold">Rental Code <span
+                                            class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i
+                                                class="fa-solid fa-magnifying-glass"></i></span>
+                                        <input type="text" id="searchRental" class="form-control"
+                                            placeholder="Search rental..." list="listRental">
+                                        <datalist id="listRental"></datalist>
+                                        <input type="hidden" id="selectRental">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Scheduled Return Date</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="fa-solid fa-calendar-check"></i>
+                                        </span>
+                                        <input type="date" id="dateScheduledReturn" class="form-control" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="dateActualReturn" class="form-label fw-bold">Actual Return Date</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-solid fa-calendar-days"></i></span>
+                                        <input type="date" id="dateActualReturn" class="form-control input-element">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="timeActualReturn" class="form-label fw-bold">Actual Return Time</label>
+                                    <input type="time" id="timeActualReturn" class="form-control input-element">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="selectItemCondition" class="form-label fw-bold">Item Condition <span
+                                            class="text-danger">*</span></label>
+                                    <select id="selectItemCondition" class="form-select input-element" required>
+                                        <option value="" selected disabled>-- Select Condition --</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="selectStatus" class="form-label fw-bold">Status <span
+                                            class="text-danger">*</span></label>
+                                    <select id="selectStatus" class="form-select input-element" required>
+                                        <option value="" selected disabled>-- Select Status --</option>
+                                    </select>
+                                </div>
+
+                            </div>
+
+                            <!-- Section: Return Person -->
+                            <hr class="form-section-divider">
+                            <h6 class="form-section-title"><i class="fa-solid fa-user me-2"></i>Return Person</h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Return By</label>
+                                    <div class="btn-group w-100" role="group">
+                                        <input type="radio" class="btn-check" name="returnPersonType"
+                                            id="radioActualCustomer" checked>
+                                        <label class="btn btn-outline-primary" for="radioActualCustomer"><i
+                                                class="fa-solid fa-user me-1"></i>Actual Customer</label>
+                                        <input type="radio" class="btn-check" name="returnPersonType"
+                                            id="radioOtherPerson">
+                                        <label class="btn btn-outline-primary" for="radioOtherPerson"><i
+                                                class="fa-solid fa-user-plus me-1"></i>Other Person</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="textReturnPerson" class="form-label fw-bold">Return Person</label>
+                                    <input type="text" id="textReturnPerson" class="form-control input-element">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="textContactNumber" class="form-label fw-bold">
+                                        Contact Number
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
+                                        <input type="text" id="textContactNumber" class="form-control" maxlength="10"
+                                            autocomplete="off">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section: Charges & Refund -->
+                            <hr class="form-section-divider">
+                            <h6 class="form-section-title"><i class="fa-solid fa-coins me-2"></i>Charges & Refund</h6>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="textSecurityDeposit" class="form-label fw-bold">Key Money <span
+                                            class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text currency">Rs.</span>
+                                        <input type="number" id="textSecurityDeposit" class="form-control" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="textDamageCharges" class="form-label fw-bold">Damage Charges</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text currency">Rs.</span>
+                                        <input type="number" id="textDamageCharges" placeholder="0.00"
+                                            class="form-control input-element" step="0.01" min="0">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="textLateReturnFee" class="form-label fw-bold">Late Return
+                                        Fee</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text currency">Rs.</span>
+                                        <input type="number" id="textLateReturnFee" class="form-control" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="textTotalRefund" class="form-label fw-bold">Total Refund</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text currency">Rs.</span>
+                                        <input type="number" id="textTotalRefund" placeholder="0.00"
+                                            class="form-control input-element readonly-calculated" step="0.01" min="0"
+                                            readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="textReceiptNumber" class="form-label fw-bold">Receipt Number</label>
+                                    <input type="text" id="textReceiptNumber" placeholder="Enter Receipt Number"
+                                        class="form-control input-element">
+                                </div>
+                            </div>
+
+                            <!-- Section: Damage & Notes -->
+                            <hr class="form-section-divider">
+                            <h6 class="form-section-title"><i class="fa-solid fa-sticky-note me-2"></i>Damage &
+                                Notes
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="textDamageDescription" class="form-label fw-bold">Damage
+                                        Description</label>
+                                    <textarea id="textDamageDescription"
+                                        placeholder="Describe any damages, stains, tears, missing parts..."
+                                        class="form-control input-element" rows="3"></textarea>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="textReturnNotes" class="form-label fw-bold">Return Notes</label>
+                                    <textarea id="textReturnNotes"
+                                        placeholder="General return observations, customer requests, special notes..."
+                                        class="form-control input-element" rows="3"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Section: Returned Items -->
+                            <hr class="form-section-divider">
+                            <div class="inner-section-header">
+                                <h6><i class="fa-solid fa-box-open me-2"></i>Returned Items</h6>
+                            </div>
+                            <div class="inner-table-container">
+                                <table class="modern-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Item Name</th>
+                                            <th>Returned ?</th>
+                                            <th>Condition</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tableBodyHandoverItems">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </form>
+
+                        <div class="panel-footer">
+                            <button type="button" id="buttonClear" class="btn-clear"
+                                onclick="document.getElementById('formHandOver')?.reset()">Clear</button>
+                            <button type="button" id="buttonUpdate" class="btn-update" style="display:none;"
+                                onclick="updateHandOverForm();">
+                                Update
+                            </button>
+
+                            <button type="button" id="buttonSubmit" class="btn-submit" onclick="submitHandOverForm();">
+                                Submit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- start table area -->
+                <div class="row m-2">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <table class="modern-table">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Customer</th>
+                                            <th>Rental No</th>
+                                            <th>Return Person</th>
+                                            <th>Actual Return Date</th>
+                                            <th>Actual Return Time</th>
+                                            <th>Status</th>
+                                            <th>Item Condition</th>
+                                            <th>Damage Charge</th>
+                                            <th>Late Return Fee</th>
+                                            <th>Total Refund</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tableBodyReturn" class="tablebody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end table area -->
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{footer :: footerFragment}"></div>
+    <script src="/js/handover.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{header :: headerFragment}"></head>
+
+<body>
+    <div class="app-layout">
+        <!-- Desktop Sidebar -->
+        <aside class="sidebar d-none d-lg-flex" th:replace="~{layout :: sidebarFragment}"></aside>
+
+        <!-- Mobile Offcanvas Sidebar -->
+        <div th:replace="~{layout :: sidebarOffcanvasFragment}"></div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <header th:replace="~{layout :: topbarFragment('Appointment Management')}"></header>
+
+            <!-- Page Content -->
+            <div class="content-wrapper">
+                <!-- Page Title Card with Add Button -->
+                <div class="card mb-3">
+                    <div class="card-header title">
+                        <div class="row align-items-center">
+                            <div class="col text-start">
+                                <h2 class="table-title">Appointment Management</h2>
+                            </div>
+                        <div class="col text-end header-actions" sec:authorize="hasAuthority('APPOINTMENT_INSERT')">
+                                 <button type="button" class="btn my-custom-employee-button" data-bs-toggle="offcanvas"
+                                     data-bs-target="#panelAppointmentForm">
+                                     <i class="fa-solid fa-plus"></i> Add New Appointment
+                                 </button>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <table class="modern-table">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Customer</th>
+                                            <th>Date</th>
+                                            <th>Start Time</th>
+                                            <th>Duration (min)</th>
+                                            <th>End Time</th>
+                                            <th>Price</th>
+                                            <th>Status</th>
+                                            <th>Booking Method</th>
+                                            <th>Beautician</th>
+                                            <th>Notes</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tableBodyAppointment" class="tablebody">
+                                        <!-- rows populated by appointment.js -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="offcanvas offcanvas-end offcanvas-panel" id="panelAppointmentForm" data-bs-backdrop="true">
+                    <div class="offcanvas-header">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <h5 class="offcanvas-title mb-0">New Appointment</h5>
+                                <small id="formHeaderSubtitle" class="text-muted">Fill appointment details below</small>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+                    </div>
+
+                    <div class="offcanvas-body">
+                        <form id="formAppointment" onsubmit="return false;">
+                            <!-- Section: Appointment Details -->
+                            <h6 class="form-section-title"><i class="fa-solid fa-calendar-check me-2"></i>Appointment Details</h6>
+                            <div class="row g-3">
+
+                                        <div class="col-md-6">
+                                            <label for="searchCustomer" class="form-label fw-bold">Customer <span class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
+                                                <input type="text" id="searchCustomer" class="form-control" placeholder="Search customer..." list="listCustomer">
+                                                <datalist id="listCustomer"></datalist>
+                                                <input type="hidden" id="selectCustomerId">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label for="dateAppointmentDate" class="form-label fw-bold">Appointment Date <span class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fa-solid fa-calendar-days"></i></span>
+                                                <input id="dateAppointmentDate" type="date" class="form-control input-element" required />
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label for="textStartTime" class="form-label fw-bold">Start Time <span class="text-danger">*</span></label>
+                                            <input id="textStartTime" type="time" class="form-control input-element" required />
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label for="textEndTime" class="form-label fw-bold">End Time <span class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fa-solid fa-clock"></i></span>
+                                                <input id="textEndTime" type="time" class="form-control input-element readonly-calculated" required readonly />
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label for="textDuration" class="form-label fw-bold">Duration <span class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                <input id="textDuration" type="number" min="0" class="form-control input-element readonly-calculated" required placeholder="Auto-calculated" readonly />
+                                                <span class="input-group-text">min</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label for="textPrice" class="form-label fw-bold">Price <span class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                <span class="input-group-text currency">Rs.</span>
+                                                <input id="textPrice" type="number" min="0" step="0.01" class="form-control input-element readonly-calculated" required placeholder="Auto-calculated" readonly />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Section: Booking Info -->
+                                    <hr class="form-section-divider">
+                                    <h6 class="form-section-title"><i class="fa-solid fa-info-circle me-2"></i>Booking Info</h6>
+                                    <div class="row g-3">
+
+                                        <div class="col-md-4">
+                                            <label for="selectStatus" class="form-label fw-bold">Status <span class="text-danger">*</span></label>
+                                            <select id="selectStatus" class="form-select input-element" required>
+                                                <option value="" selected disabled>-- Select Status --</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label for="selectBookingMethod" class="form-label fw-bold">Booking Method <span class="text-danger">*</span></label>
+                                            <select id="selectBookingMethod" class="form-select input-element" required>
+                                                <option value="" selected disabled>-- Select Method --</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label for="searchBeautician" class="form-label fw-bold">Beautician <span class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
+                                                <input type="text" id="searchBeautician" class="form-control" placeholder="Search beautician..." list="listBeautician">
+                                                <datalist id="listBeautician"></datalist>
+                                                <input type="hidden" id="selectBeauticianId">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12">
+                                            <label for="textNotes" class="form-label fw-bold">Notes</label>
+                                            <textarea id="textNotes" class="form-control input-element" rows="3" placeholder="Optional notes"></textarea>
+                                        </div>
+                                    </div>
+
+                                    <!-- Inner form/table for selected package details -->
+                                    <hr class="form-section-divider">
+                                    <div class="inner-section-header">
+                                        <h6><i class="fa-solid fa-box me-2"></i>Service Packages</h6>
+                                        <button type="button" class="btn btn-sm btn-primary" id="buttonAddPackage" onclick="addPackageRow()"><i class="fa-solid fa-plus me-1"></i>Add</button>
+                                    </div>
+                                    <div class="inner-table-container">
+                                        <div class="inner-controls">
+                                            <div class="row mb-2 mt-2 align-items-end">
+                                                <div class="col-md-8">
+                                                    <label for="selectServicePackage" class="form-label fw-bold">Select Service Package</label>
+                                                    <select id="selectServicePackage" class="form-select">
+                                                        <option value="" selected disabled>-- Select Package --</option>
+                                                        <!-- Options to be populated dynamically by JS or server -->
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Individual Services Section -->
+                                    <hr class="form-section-divider">
+                                    <div class="inner-section-header">
+                                        <h6><i class="fa-solid fa-scissors me-2"></i>Individual Services</h6>
+                                        <button type="button" class="btn btn-sm btn-success" id="buttonAddService" onclick="addServiceRow()"><i class="fa-solid fa-plus me-1"></i>Add</button>
+                                    </div>
+                                    <div class="inner-table-container">
+                                        <div class="inner-controls">
+                                            <div class="row mb-2 mt-2 align-items-end">
+                                                <div class="col-md-8">
+                                                    <label for="selectService" class="form-label fw-bold">Select Service</label>
+                                                    <select id="selectService" class="form-select">
+                                                        <option value="" selected disabled>-- Select Service --</option>
+                                                        <!-- Options to be populated dynamically by JS -->
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Combined Selected Items Table -->
+                                    <hr class="form-section-divider">
+                                    <h6 class="form-section-title"><i class="fa-solid fa-list me-2"></i>Selected Services & Packages</h6>
+                                    <div class="inner-table-container">
+                                        <table class="modern-table" id="tableSelectedPackages">
+                                            <thead class="table-secondary">
+                                                <tr>
+                                                    <th>Type</th>
+                                                    <th>Name</th>
+                                                    <th>Duration (min)</th>
+                                                    <th>Price (Rs.)</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tableBodySelectedPackagesInnerForm" class="tablebody">
+                                                <!-- Populated by JS -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </form>
+
+                                <div class="panel-footer">
+                                    <button type="button" id="buttonClear" class="btn-clear" onclick="document.getElementById('formAppointment')?.reset()" aria-label="Clear form">Clear</button>
+                                    <button type="button" id="buttonUpdate" class="btn-update" style="display:none" aria-label="Update appointment" onclick="buttonAppointmentUpdate()">Update</button>
+                                    <button type="button" id="buttonSubmit" class="btn-submit" aria-label="Submit new appointment" onclick="submitAppointmentForm()">Submit</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{footer :: footerFragment}"></div>
+    <script src="/js/appointment.js"></script>
+</body>
+</html>

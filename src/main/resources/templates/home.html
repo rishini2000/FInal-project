@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{header :: headerFragment}"></head>
+
+<body>
+    <div class="app-layout">
+        <!-- Desktop Sidebar -->
+        <aside class="sidebar d-none d-lg-flex" th:replace="~{layout :: sidebarFragment}"></aside>
+
+        <!-- Mobile Offcanvas Sidebar -->
+        <div th:replace="~{layout :: sidebarOffcanvasFragment}"></div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <header class="top-bar">
+                <div class="top-bar-left">
+                    <button class="btn sidebar-toggle d-lg-none" type="button" data-bs-toggle="offcanvas"
+                            data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <h1 class="page-title">Dashboard</h1>
+                </div>
+                <div class="top-bar-right">
+                    <span class="user-greeting" sec:authorize="isAuthenticated()">
+                        <i class="fa-solid fa-circle-user"></i>
+                        <span sec:authentication="name">User</span>
+                    </span>
+                    <form th:action="@{/logout}" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-logout" title="Logout">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                        </button>
+                    </form>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <div class="content-wrapper">
+                <!-- Admin/Manager Dashboard -->
+                <div sec:authorize="hasAnyAuthority('ADMIN', 'MANAGER')">
+                    <!-- Welcome Banner -->
+                    <div class="card mb-4" style="background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%); border: none;">
+                        <div class="card-body py-4 px-4">
+                            <h2 style="color: #fff; font-family: var(--font-heading); font-weight: 800; margin-bottom: 0.25rem;">
+                                Welcome, Administrator
+                            </h2>
+                            <p style="color: rgba(255,255,255,0.85); margin: 0; font-size: 0.95rem;">
+                                Manage your salon operations from one place. Use the sidebar to navigate between modules.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Quick Stats -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-sm-6 col-xl-3">
+                            <div class="card h-100">
+                                <div class="card-body d-flex align-items-center gap-3">
+                                    <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fa-solid fa-users" style="color: #fff; font-size: 1.2rem;"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);" id="statEmployees">-</div>
+                                        <div style="font-size: 0.8rem; color: var(--text-secondary);">Employees</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-xl-3">
+                            <div class="card h-100">
+                                <div class="card-body d-flex align-items-center gap-3">
+                                    <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #11998e, #38ef7d); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fa-solid fa-user-check" style="color: #fff; font-size: 1.2rem;"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);" id="statCustomers">-</div>
+                                        <div style="font-size: 0.8rem; color: var(--text-secondary);">Customers</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-xl-3">
+                            <div class="card h-100">
+                                <div class="card-body d-flex align-items-center gap-3">
+                                    <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #4facfe, #00f2fe); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fa-solid fa-calendar-days" style="color: #fff; font-size: 1.2rem;"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);" id="statAppointments">-</div>
+                                        <div style="font-size: 0.8rem; color: var(--text-secondary);">Appointments</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-xl-3">
+                            <div class="card h-100">
+                                <div class="card-body d-flex align-items-center gap-3">
+                                    <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #fa709a, #fee140); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fa-solid fa-scissors" style="color: #fff; font-size: 1.2rem;"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);" id="statServices">-</div>
+                                        <div style="font-size: 0.8rem; color: var(--text-secondary);">Services</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Access Cards -->
+                    <div class="row g-3">
+                        <div class="col-md-6 col-xl-4" sec:authorize="hasAuthority('EMPLOYEE_SELECT')">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center gap-3 mb-3">
+                                        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fa-solid fa-user-tie" style="color: #fff;"></i>
+                                        </div>
+                                        <h5 class="card-title mb-0" style="font-family: var(--font-heading); font-weight: 700;">Employees</h5>
+                                    </div>
+                                    <p class="card-text text-secondary" style="font-size: 0.875rem;">Manage your staff, designations, and employee statuses.</p>
+                                    <a href="/employee" class="btn btn-sm btn-outline-primary">Go to Employees</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-xl-4" sec:authorize="hasAuthority('APPOINTMENT_SELECT')">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center gap-3 mb-3">
+                                        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #4facfe, #00f2fe); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fa-solid fa-calendar-check" style="color: #fff;"></i>
+                                        </div>
+                                        <h5 class="card-title mb-0" style="font-family: var(--font-heading); font-weight: 700;">Appointments</h5>
+                                    </div>
+                                    <p class="card-text text-secondary" style="font-size: 0.875rem;">Schedule and manage customer bookings and appointments.</p>
+                                    <a href="/appointment" class="btn btn-sm btn-outline-primary">Go to Appointments</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-xl-4" sec:authorize="hasAuthority('CUSTOMER_SELECT')">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center gap-3 mb-3">
+                                        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #11998e, #38ef7d); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fa-solid fa-user-group" style="color: #fff;"></i>
+                                        </div>
+                                        <h5 class="card-title mb-0" style="font-family: var(--font-heading); font-weight: 700;">Customers</h5>
+                                    </div>
+                                    <p class="card-text text-secondary" style="font-size: 0.875rem;">View and manage customer records and payment history.</p>
+                                    <a href="/customer" class="btn btn-sm btn-outline-primary">Go to Customers</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-xl-4" sec:authorize="hasAuthority('SERVICE_SELECT')">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center gap-3 mb-3">
+                                        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #f093fb, #f5576c); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fa-solid fa-spa" style="color: #fff;"></i>
+                                        </div>
+                                        <h5 class="card-title mb-0" style="font-family: var(--font-heading); font-weight: 700;">Services</h5>
+                                    </div>
+                                    <p class="card-text text-secondary" style="font-size: 0.875rem;">Manage salon services, pricing, and service packages.</p>
+                                    <a href="/service" class="btn btn-sm btn-outline-primary">Go to Services</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-xl-4" sec:authorize="hasAuthority('ITEM_SELECT')">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center gap-3 mb-3">
+                                        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #fa709a, #fee140); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fa-solid fa-shirt" style="color: #fff;"></i>
+                                        </div>
+                                        <h5 class="card-title mb-0" style="font-family: var(--font-heading); font-weight: 700;">Inventory</h5>
+                                    </div>
+                                    <p class="card-text text-secondary" style="font-size: 0.875rem;">Manage items, rental records, and rental pricing.</p>
+                                    <a href="/item" class="btn btn-sm btn-outline-primary">Go to Inventory</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-xl-4" sec:authorize="hasAuthority('FITTON_SELECT')">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center gap-3 mb-3">
+                                        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary), var(--accent)); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fa-solid fa-clipboard-list" style="color: #fff;"></i>
+                                        </div>
+                                        <h5 class="card-title mb-0" style="font-family: var(--font-heading); font-weight: 700;">Workflow</h5>
+                                    </div>
+                                    <p class="card-text text-secondary" style="font-size: 0.875rem;">Fitting sessions, pickups, and handover management.</p>
+                                    <a href="/fitton" class="btn btn-sm btn-outline-primary">Go to Workflow</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Receptionist Dashboard -->
+                <div sec:authorize="hasAuthority('RECEPTIONIST')">
+                    <div class="card mb-4" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); border: none;">
+                        <div class="card-body py-4 px-4">
+                            <h2 style="color: #fff; font-family: var(--font-heading); font-weight: 800; margin-bottom: 0.25rem;">
+                                Welcome, Receptionist
+                            </h2>
+                            <p style="color: rgba(255,255,255,0.85); margin: 0; font-size: 0.95rem;">
+                                Manage appointments and customer interactions.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Receptionist Quick Actions -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4" sec:authorize="hasAuthority('APPOINTMENT_INSERT')">
+                            <div class="card h-100">
+                                <div class="card-body text-center">
+                                    <i class="fa-solid fa-calendar-plus fa-2x mb-3" style="color: var(--primary);"></i>
+                                    <h5 class="card-title">New Appointment</h5>
+                                    <p class="card-text text-secondary small">Schedule a new appointment for a customer</p>
+                                    <a href="/appointment" class="btn btn-primary btn-sm">Book Now</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4" sec:authorize="hasAuthority('CUSTOMER_INSERT')">
+                            <div class="card h-100">
+                                <div class="card-body text-center">
+                                    <i class="fa-solid fa-user-plus fa-2x mb-3" style="color: var(--accent);"></i>
+                                    <h5 class="card-title">New Customer</h5>
+                                    <p class="card-text text-secondary small">Register a new customer in the system</p>
+                                    <a href="/customer" class="btn btn-primary btn-sm">Add Customer</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4" sec:authorize="hasAuthority('PAYMENT_SELECT')">
+                            <div class="card h-100">
+                                <div class="card-body text-center">
+                                    <i class="fa-solid fa-credit-card fa-2x mb-3" style="color: #28a745;"></i>
+                                    <h5 class="card-title">Payments</h5>
+                                    <p class="card-text text-secondary small">Process payments and view billing</p>
+                                    <a href="/payment" class="btn btn-primary btn-sm">View Payments</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stylist/Beautician Dashboard -->
+                <div sec:authorize="hasAuthority('STYLIST')">
+                    <div class="card mb-4" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border: none;">
+                        <div class="card-body py-4 px-4">
+                            <h2 style="color: #fff; font-family: var(--font-heading); font-weight: 800; margin-bottom: 0.25rem;">
+                                Welcome, Stylist
+                            </h2>
+                            <p style="color: rgba(255,255,255,0.85); margin: 0; font-size: 0.95rem;">
+                                View your schedule and client information.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Stylist Quick Actions -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6" sec:authorize="hasAuthority('APPOINTMENT_SELECT')">
+                            <div class="card h-100">
+                                <div class="card-body text-center">
+                                    <i class="fa-solid fa-calendar-check fa-2x mb-3" style="color: var(--primary);"></i>
+                                    <h5 class="card-title">My Schedule</h5>
+                                    <p class="card-text text-secondary small">View your upcoming appointments</p>
+                                    <a href="/appointment" class="btn btn-primary btn-sm">View Schedule</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6" sec:authorize="hasAuthority('CUSTOMER_SELECT')">
+                            <div class="card h-100">
+                                <div class="card-body text-center">
+                                    <i class="fa-solid fa-users fa-2x mb-3" style="color: var(--accent);"></i>
+                                    <h5 class="card-title">My Clients</h5>
+                                    <p class="card-text text-secondary small">View your client history and details</p>
+                                    <a href="/customer" class="btn btn-primary btn-sm">View Clients</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rental Manager Dashboard -->
+                <div sec:authorize="hasAuthority('RENTAL_MANAGER')">
+                    <div class="card mb-4" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); border: none;">
+                        <div class="card-body py-4 px-4">
+                            <h2 style="color: #fff; font-family: var(--font-heading); font-weight: 800; margin-bottom: 0.25rem;">
+                                Welcome, Rental Manager
+                            </h2>
+                            <p style="color: rgba(255,255,255,0.85); margin: 0; font-size: 0.95rem;">
+                                Manage inventory rentals, fittings, pickups, and handovers.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Rental Manager Quick Actions -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-3" sec:authorize="hasAuthority('RENTAL_SELECT')">
+                            <div class="card h-100">
+                                <div class="card-body text-center">
+                                    <i class="fa-solid fa-truck fa-2x mb-3" style="color: var(--primary);"></i>
+                                    <h5 class="card-title">Active Rentals</h5>
+                                    <p class="card-text text-secondary small">View and manage active rental agreements</p>
+                                    <a href="/rental" class="btn btn-primary btn-sm">View Rentals</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3" sec:authorize="hasAuthority('ITEM_SELECT')">
+                            <div class="card h-100">
+                                <div class="card-body text-center">
+                                    <i class="fa-solid fa-boxes-stacked fa-2x mb-3" style="color: var(--accent);"></i>
+                                    <h5 class="card-title">Inventory</h5>
+                                    <p class="card-text text-secondary small">Check item availability and status</p>
+                                    <a href="/item" class="btn btn-primary btn-sm">View Inventory</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3" sec:authorize="hasAuthority('FITTON_SELECT')">
+                            <div class="card h-100">
+                                <div class="card-body text-center">
+                                    <i class="fa-solid fa-person-dress fa-2x mb-3" style="color: #28a745;"></i>
+                                    <h5 class="card-title">Fittings</h5>
+                                    <p class="card-text text-secondary small">Schedule and manage fitting sessions</p>
+                                    <a href="/fitton" class="btn btn-primary btn-sm">View Fittings</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3" sec:authorize="hasAuthority('HANDOVER_SELECT')">
+                            <div class="card h-100">
+                                <div class="card-body text-center">
+                                    <i class="fa-solid fa-rotate-left fa-2x mb-3" style="color: #ffc107;"></i>
+                                    <h5 class="card-title">Returns</h5>
+                                    <p class="card-text text-secondary small">Process item returns and handovers</p>
+                                    <a href="/handover" class="btn btn-primary btn-sm">View Returns</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{footer :: footerFragment}"></div>
+
+    <script>
+        $(document).ready(function () {
+            // Load stats only for Admin/Manager
+            if ($('#statEmployees').length > 0) {
+                $.get('/employee/alldata', function (data) { $('#statEmployees').text(data.length); });
+                $.get('/customer/alldata', function (data) { $('#statCustomers').text(data.length); });
+                $.get('/appointment/alldata', function (data) { $('#statAppointments').text(data.length); });
+                $.get('/service/alldata', function (data) { $('#statServices').text(data.length); });
+            }
+        });
+    </script>
+</body>
+
+</html>

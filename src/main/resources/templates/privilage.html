@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{header :: headerFragment}"></head>
+
+<body>
+    <div class="app-layout">
+        <aside class="sidebar d-none d-lg-flex" th:replace="~{layout :: sidebarFragment}"></aside>
+        <div th:replace="~{layout :: sidebarOffcanvasFragment}"></div>
+
+        <div class="main-content">
+            <header th:replace="~{layout :: topbarFragment('Privilage Management')}"></header>
+
+            <div class="content-wrapper">
+                <div class="card mb-3">
+                    <div class="card-header title">
+                        <div class="row align-items-center">
+                            <div class="col text-start">
+                                <h2 class="table-title">Privilage Management</h2>
+                            </div>
+                            <div class="col text-end header-actions" sec:authorize="hasAuthority('PRIVILAGE_INSERT')">
+                                 <button type="button" class="btn my-custom-employee-button" data-bs-toggle="offcanvas"
+                                     data-bs-target="#panelPrivilageForm">
+                                     <i class="fa-solid fa-plus"></i> Add New Privilage
+                                 </button>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="offcanvas offcanvas-end offcanvas-panel" id="panelPrivilageForm" data-bs-backdrop="true">
+                    <div class="offcanvas-header">
+                        <h5 class="offcanvas-title">New Privilege</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+                    </div>
+                    <div class="offcanvas-body">
+                        <form id="formPrivilage" onsubmit="return false;">
+                            <h6 class="form-section-title"><i class="fa-solid fa-user-shield me-2"></i>Privilege Assignment</h6>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="selectRole" class="form-label fw-bold"><i class="fa-solid fa-users me-1"></i>Role <span class="text-danger">*</span></label>
+                                    <select id="selectRole" class="form-select input-element" required onchange="privilage.role_id = JSON.parse(this.value); setValid(this);">
+                                        <option value="" selected disabled>-- Select Role --</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label for="selectModule" class="form-label fw-bold"><i class="fa-solid fa-cube me-1"></i>Module <span class="text-danger">*</span></label>
+                                    <select id="selectModule" class="form-select input-element" required onchange="privilage.module_id = JSON.parse(this.value); setValid(this);">
+                                        <option value="" selected disabled>-- Select Module --</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <hr class="form-section-divider">
+                            <h6 class="form-section-title"><i class="fa-solid fa-shield-halved me-2"></i>Permissions</h6>
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" role="switch" id="checkboxSelect">
+                                        <label class="form-check-label" for="checkboxSelect">Select</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" role="switch" id="checkboxInsert">
+                                        <label class="form-check-label" for="checkboxInsert">Insert</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" role="switch" id="checkboxUpdate">
+                                        <label class="form-check-label" for="checkboxUpdate">Update</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" role="switch" id="checkboxDelete">
+                                        <label class="form-check-label" for="checkboxDelete">Delete</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
+                        <div class="panel-footer">
+                            <button type="button" id="buttonClear" class="btn-clear"
+                                onclick="document.getElementById('formPrivilage')?.reset()">Clear</button>
+                            <button type="button" id="buttonUpdate" class="btn-update" style="display:none;"
+                                onclick="updatePrivilageForm();">Update</button>
+                            <button type="button" id="buttonSubmit" class="btn-submit"
+                                onclick="submitPrivilageForm();">Submit</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row m-2">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <table class="modern-table">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Role</th>
+                                            <th>Module</th>
+                                            <th>Select</th>
+                                            <th>Insert</th>
+                                            <th>Update</th>
+                                            <th>Delete</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tableBodyPrivilage" class="tablebody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{footer :: footerFragment}"></div>
+    <script src="/js/privilage.js"></script>
+</body>
+
+</html>
